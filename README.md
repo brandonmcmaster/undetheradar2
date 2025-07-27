@@ -12,7 +12,7 @@ API that powers the platform. It aims to provide artists with a simple place
 to:
 
 - Create and maintain personal profiles
-- Upload photos and videos
+- Post photos and videos to your profile
 - Stream and share their music
 - Post show dates
 - Sell merchandise directly
@@ -34,6 +34,8 @@ minimal dependencies. Structured logs are produced with **Pino**. Current endpoi
 - `GET /media` – list uploaded files
 - `POST /media` – upload a file (requires authentication)
 - `GET /media/:id` – stream or download a specific file
+- `GET /profile-media/user/:id` – pictures and videos on a user's profile
+- `POST /profile-media` – post a picture or video to your profile (requires authentication)
 
 Future additions will cover show listings, merch management and the message
 board. Everything is intentionally straightforward with no ranking algorithms.
@@ -99,6 +101,7 @@ Current tables include:
 - `board_posts` – simple message board entries
 - `board_reactions` – user likes or dislikes on board posts
 - `board_comments` – comments attached to board posts
+- `profile_media` – pictures and videos displayed on user profiles
 
 ## API Endpoints
 
@@ -163,6 +166,11 @@ Uploaded files are stored in the `uploads` directory and scanned with
 `clamscan` when available. Only JPEG, PNG, MP3 and MP4 files up to 10 MB are
 accepted. The database records the original filename, MIME type, size and the
 user who uploaded each file.
+
+### `/profile-media`
+
+- `GET /profile-media/user/:id` – pictures and videos on a user's profile
+- `POST /profile-media` – post a picture or video to your profile (requires authentication)
 
 ### `/shows`
 

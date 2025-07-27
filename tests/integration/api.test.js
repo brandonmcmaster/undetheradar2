@@ -216,6 +216,29 @@ test('avatar upload works', async () => {
   expect(ujson.avatar_id).toBe(data.avatar_id);
 });
 
+test('profile media upload and listing works', async () => {
+  const reg = await context.post('/auth/register', {
+    data: { name: 'Jo', username: 'jo', password: 'pw' }
+  });
+  const { token, id } = await reg.json();
+  const fs = require('fs');
+  const path = require('path');
+  const tmp = path.join(__dirname, 'post.png');
+  fs.writeFileSync(tmp, Buffer.from([0xff, 0xd8, 0xff]));
+  const up = await context.post('/profile-media', {
+    headers: { Authorization: `Bearer ${token}` },
+    multipart: { file: fs.createReadStream(tmp) }
+  });
+  fs.unlinkSync(tmp);
+  expect(up.ok()).toBeTruthy();
+  const { media_id } = await up.json();
+  expect(media_id).toBeGreaterThan(0);
+  const list = await context.get(`/profile-media/user/${id}`);
+  expect(list.ok()).toBeTruthy();
+  const arr = await list.json();
+  expect(arr.find(m => m.id === media_id)).toBeTruthy();
+});
+
 test('metrics endpoint responds', async () => {
   const res = await context.get('/metrics');
   expect(res.ok()).toBeTruthy();
