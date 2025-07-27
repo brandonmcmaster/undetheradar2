@@ -60,7 +60,7 @@ Once running, open [http://localhost:3000](http://localhost:3000) to view the
 React interface. All frontend libraries (React, React Router, Tailwind and
 Babel) are included in the repository under `public/vendor` so the site works
 without hitting external CDNs. The UI embraces a retro internet vibe and
-provides pages for signing in, browsing artists (with individual artist profiles), managing your profile,
+provides pages for signing in, browsing artists (with individual artist profiles), viewing your profile and editing it at `/profile/edit`,
 exchanging messages and viewing uploaded media. Placeholders for the upcoming
 show calendar and merch shop are also included.
 Swagger documentation is available at [http://localhost:3000/docs](http://localhost:3000/docs).

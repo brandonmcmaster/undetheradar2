@@ -105,6 +105,7 @@ function SignIn({ auth }) {
 function Profile({ auth }) {
   const [profile, setProfile] = React.useState(null);
   const [avatarFile, setAvatarFile] = React.useState(null);
+  const nav = useNavigate();
   React.useEffect(() => {
     if (!auth.token || !auth.userId) return;
     fetch(`/users/${auth.userId}`)
@@ -138,6 +139,7 @@ function Profile({ auth }) {
         <div className="text-sm">@{profile.username}</div>
         <div>Email: {profile.email || 'N/A'}</div>
         <div>Bio: {profile.bio || 'N/A'}</div>
+        <button className="bg-gray-300 px-2 py-1" onClick={() => nav('/profile/edit')}>Edit Profile</button>
       </div>
       <div>
         <div className="font-bold mb-1">Media</div>
@@ -151,6 +153,61 @@ function Profile({ auth }) {
         <div className="font-bold mb-1">Upcoming Shows</div>
         <ShowsSection userId={auth.userId} />
       </div>
+    </div>
+  );
+}
+
+function EditProfile({ auth }) {
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [bio, setBio] = React.useState('');
+  const [social, setSocial] = React.useState('');
+  const nav = useNavigate();
+
+  React.useEffect(() => {
+    if (!auth.token || !auth.userId) return;
+    fetch(`/users/${auth.userId}`)
+      .then(r => r.json())
+      .then(u => {
+        setName(u.name || '');
+        setEmail(u.email || '');
+        setBio(u.bio || '');
+        setSocial(u.social || '');
+      });
+  }, [auth]);
+
+  const save = () => {
+    fetch('/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.token}`
+      },
+      body: JSON.stringify({ name, email, bio, social })
+    }).then(() => nav('/profile'));
+  };
+
+  if (!auth.token) return <div className="p-4">Please sign in.</div>;
+
+  return (
+    <div className="p-4 space-y-2 max-w-xl mx-auto">
+      <div>
+        <label className="block">Name</label>
+        <input className="border p-1 w-full" value={name} onChange={e => setName(e.target.value)} />
+      </div>
+      <div>
+        <label className="block">Email</label>
+        <input className="border p-1 w-full" value={email} onChange={e => setEmail(e.target.value)} />
+      </div>
+      <div>
+        <label className="block">Bio</label>
+        <textarea className="border p-1 w-full" value={bio} onChange={e => setBio(e.target.value)} />
+      </div>
+      <div>
+        <label className="block">Social</label>
+        <input className="border p-1 w-full" value={social} onChange={e => setSocial(e.target.value)} />
+      </div>
+      <button className="bg-blue-600 text-white px-2 py-1" onClick={save}>Save</button>
     </div>
   );
 }
@@ -526,6 +583,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn auth={auth} />} />
           <Route path="/profile" element={<Profile auth={auth} />} />
+          <Route path="/profile/edit" element={<EditProfile auth={auth} />} />
           <Route path="/artists" element={<Artists />} />
           <Route path="/artists/:id" element={<ArtistDetail />} />
           <Route path="/messages" element={<Messages auth={auth} />} />
