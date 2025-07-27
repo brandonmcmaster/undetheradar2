@@ -52,7 +52,11 @@ router.post('/', authenticate, upload.single('file'), (req, res, next) => {
   const filePath = path.join(uploadDir, req.file.filename);
   // Virus scan using clamscan if available
   exec(`clamscan ${filePath}`, (err, stdout) => {
-    if (err && err.code !== 1 && err.code !== 2) return next(new Error('Virus scan failed'));
+    if (err && err.code === 127) {
+      // clamscan not installed, skip scanning
+    } else if (err && err.code !== 1 && err.code !== 2) {
+      return next(new Error('Virus scan failed'));
+    }
     if (stdout && stdout.includes('FOUND')) {
       fs.unlinkSync(filePath);
       const infected = new Error('Infected file');
