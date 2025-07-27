@@ -25,8 +25,7 @@ function Nav({ auth }) {
   return (
     <nav className="bg-blue-800 text-white p-2 flex flex-wrap space-x-4">
       <Link className="hover:underline" to="/">Home</Link>
-      <Link className="hover:underline" to="/artists">Artists</Link>
-      <Link className="hover:underline" to="/users">Users</Link>
+      <Link className="hover:underline" to="/browse">Browse</Link>
       <Link className="hover:underline" to="/media">Media</Link>
       <Link className="hover:underline" to="/messages">Messages</Link>
       <Link className="hover:underline" to="/board">Board</Link>
@@ -57,7 +56,7 @@ function Home() {
 function SignIn({ auth }) {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [isArtist, setIsArtist] = React.useState(false);
+  const [profileType, setProfileType] = React.useState('user');
   const nav = useNavigate();
 
   const login = async () => {
@@ -79,7 +78,12 @@ function SignIn({ auth }) {
     const res = await fetch('/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: username, username, password, is_artist: isArtist })
+      body: JSON.stringify({
+        name: username,
+        username,
+        password,
+        is_artist: profileType === 'artist'
+      })
     });
     const data = await res.json();
     if (data.token) {
@@ -98,7 +102,24 @@ function SignIn({ auth }) {
       </div>
       <div className="space-x-2">
         <label>
-          <input type="checkbox" checked={isArtist} onChange={e => setIsArtist(e.target.checked)} /> Artist profile
+          <input
+            type="radio"
+            name="ptype"
+            value="user"
+            checked={profileType === 'user'}
+            onChange={() => setProfileType('user')}
+          />{' '}
+          User
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="ptype"
+            value="artist"
+            checked={profileType === 'artist'}
+            onChange={() => setProfileType('artist')}
+          />{' '}
+          Artist
         </label>
       </div>
       <div>
@@ -219,56 +240,60 @@ function EditProfile({ auth }) {
   );
 }
 
-function Artists() {
+function Browse({ defaultTab = 'artist' }) {
+  const [tab, setTab] = React.useState(defaultTab);
   const [users, setUsers] = React.useState([]);
   React.useEffect(() => {
-    fetch('/users?type=artist')
+    fetch(`/users?type=${tab}`)
       .then(r => r.json())
       .then(setUsers);
-  }, []);
+  }, [tab]);
+  const base = tab === 'artist' ? '/artists/' : '/users/';
   return (
-    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-      {users.map(u => (
-        <Link key={u.id} to={`/artists/${u.id}`} className="border p-2 bg-white flex items-center space-x-2 hover:bg-gray-100">
-          {u.avatar_id ? (
-            <img className="w-12 h-12 object-cover rounded-full" src={`/media/${u.avatar_id}`} alt="avatar" />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
-          )}
-          <div>
-            <div className="font-bold">{u.name}</div>
-            <div className="text-sm">@{u.username}</div>
-          </div>
-        </Link>
-      ))}
+    <div className="p-4">
+      <div className="mb-4 space-x-2">
+        <button
+          className={`px-2 py-1 ${tab === 'artist' ? 'bg-blue-600 text-white' : 'bg-white border'}`}
+          onClick={() => setTab('artist')}
+        >
+          Artists
+        </button>
+        <button
+          className={`px-2 py-1 ${tab === 'user' ? 'bg-blue-600 text-white' : 'bg-white border'}`}
+          onClick={() => setTab('user')}
+        >
+          Users
+        </button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {users.map(u => (
+          <Link
+            key={u.id}
+            to={`${base}${u.id}`}
+            className="border p-2 bg-white flex items-center space-x-2 hover:bg-gray-100"
+          >
+            {u.avatar_id ? (
+              <img className="w-12 h-12 object-cover rounded-full" src={`/media/${u.avatar_id}`} alt="avatar" />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
+            )}
+            <div>
+              <div className="font-bold">{u.name}</div>
+              <div className="text-sm">@{u.username}</div>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
 
+function Artists() {
+  return <Browse defaultTab="artist" />;
+}
+
 function UsersPage() {
-  const [users, setUsers] = React.useState([]);
-  React.useEffect(() => {
-    fetch('/users?type=user')
-      .then(r => r.json())
-      .then(setUsers);
-  }, []);
-  return (
-    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-      {users.map(u => (
-        <Link key={u.id} to={`/users/${u.id}`} className="border p-2 bg-white flex items-center space-x-2 hover:bg-gray-100">
-          {u.avatar_id ? (
-            <img className="w-12 h-12 object-cover rounded-full" src={`/media/${u.avatar_id}`} alt="avatar" />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
-          )}
-          <div>
-            <div className="font-bold">{u.name}</div>
-            <div className="text-sm">@{u.username}</div>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
+  return <Browse defaultTab="user" />;
 }
 
 function UserDetail() {
@@ -659,6 +684,7 @@ function App() {
           <Route path="/signin" element={<SignIn auth={auth} />} />
           <Route path="/profile" element={<Profile auth={auth} />} />
           <Route path="/profile/edit" element={<EditProfile auth={auth} />} />
+          <Route path="/browse" element={<Browse />} />
           <Route path="/artists" element={<Artists />} />
           <Route path="/artists/:id" element={<ArtistDetail />} />
           <Route path="/users" element={<UsersPage />} />
