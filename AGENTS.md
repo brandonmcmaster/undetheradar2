@@ -20,6 +20,7 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 ## Contributions
 - Document any new endpoints or significant features in `README.md`.
 - Update this `AGENTS.md` with any new development guidelines.
+- Expose API documentation via Swagger at `/docs` when adding new endpoints.
 
 ## Frontend
 - The `public` folder now contains a small React app served via CDN.
