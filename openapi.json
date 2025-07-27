@@ -33,13 +33,15 @@
                   "password": { "type": "string" },
                   "email": { "type": "string" },
                   "bio": { "type": "string" },
-                  "social": { "type": "string" }
+                  "social": { "type": "string" },
+                  "is_artist": { "type": "boolean" }
                 }
               },
               "example": {
                 "name": "Alice",
                 "username": "alice",
-                "password": "secret"
+                "password": "secret",
+                "is_artist": true
               }
             }
           }
@@ -92,7 +94,15 @@
     },
     "/users": {
       "get": {
-        "summary": "List all users",
+        "summary": "List users",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["artist", "user"] },
+            "description": "Filter by profile type"
+          }
+        ],
         "responses": {
           "200": {
             "description": "User list",

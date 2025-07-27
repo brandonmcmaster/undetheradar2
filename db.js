@@ -15,7 +15,8 @@ const init = () => {
       password TEXT NOT NULL,
       email TEXT,
       bio TEXT,
-      social TEXT
+      social TEXT,
+      is_artist INTEGER DEFAULT 0
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS messages (
@@ -98,12 +99,15 @@ const init = () => {
       add('user_id', 'INTEGER');
     });
 
-    // Ensure users table has avatar_id column
+    // Ensure users table has avatar_id and is_artist columns
     db.all('PRAGMA table_info(users)', [], (err, cols) => {
       if (err) return;
       const names = cols.map(c => c.name);
       if (!names.includes('avatar_id')) {
         db.run('ALTER TABLE users ADD COLUMN avatar_id INTEGER');
+      }
+      if (!names.includes('is_artist')) {
+        db.run('ALTER TABLE users ADD COLUMN is_artist INTEGER DEFAULT 0');
       }
     });
   });
