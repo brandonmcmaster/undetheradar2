@@ -45,9 +45,11 @@ npm start
 
 The server listens on port `3000` by default.
 
-Once running, open [http://localhost:3000](http://localhost:3000) to use the
-included demo front end. The interface lets you create users, send messages and
-upload media using the API endpoints described below.
+Once running, open [http://localhost:3000](http://localhost:3000) to view the
+new React interface. The UI is built with **Tailwind CSS** and embraces a retro
+internet vibe. It provides pages for signing in, browsing artists, managing
+your profile, exchanging messages and viewing uploaded media. Placeholders for
+the upcoming show calendar and merch shop are also included.
 
 ## Database
 

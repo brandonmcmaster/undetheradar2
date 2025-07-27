@@ -20,5 +20,10 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 - Document any new endpoints or significant features in `README.md`.
 - Update this `AGENTS.md` with any new development guidelines.
 
+## Frontend
+- The `public` folder now contains a small React app served via CDN.
+- Tailwind CSS provides styling with a retro aesthetic.
+- Keep frontend JavaScript indented with 2 spaces like the backend.
+
 ## Testing
 - Run `npm start` to verify that the server starts without errors.
