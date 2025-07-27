@@ -6,6 +6,10 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 - Use 2-space indentation in JavaScript files.
 - Stick to CommonJS `require`/`module.exports` syntax.
 - Keep dependencies minimal.
+- Foreign key constraints are enabled via `PRAGMA foreign_keys = ON`.
+
+## Database
+- New tables: `shows`, `merch` and `board_posts`.
 
 ## Contributions
 - Document any new endpoints or significant features in `README.md`.

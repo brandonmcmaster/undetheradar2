@@ -49,7 +49,18 @@ upload media using the API endpoints described below.
 
 The API uses **SQLite** for data storage. When you start the server for the
 first time it will automatically create a file named `app.db` in the project
-root containing the required tables.
+root containing the required tables. Foreign key support is enabled with
+`PRAGMA foreign_keys = ON` so related records are removed when a parent row is
+deleted.
+
+Current tables include:
+
+- `users` – basic user profiles
+- `messages` – direct messages linked to `users`
+- `media` – uploaded files
+- `shows` – upcoming performances for an artist
+- `merch` – merchandise items for sale
+- `board_posts` – simple message board entries
 
 ## API Endpoints
 
