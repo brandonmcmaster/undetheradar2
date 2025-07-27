@@ -8,6 +8,8 @@ const usersRouter = require('./routes/users');
 const messagesRouter = require('./routes/messages');
 const mediaRouter = require('./routes/media');
 const authRouter = require('./routes/auth');
+const showsRouter = require('./routes/shows');
+const merchRouter = require('./routes/merch');
 const errorHandler = require('./middleware/error');
 
 const app = express();
@@ -29,6 +31,8 @@ app.use('/users', usersRouter);
 app.use('/messages', messagesRouter);
 app.use('/media', mediaRouter);
 app.use('/auth', authRouter);
+app.use('/shows', showsRouter);
+app.use('/merch', merchRouter);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
