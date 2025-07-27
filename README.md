@@ -141,3 +141,7 @@ All incoming requests now go through `express-validator` checks. For example,
 IDs must be integers and required fields like usernames may not be empty.
 Any validation issues or other errors are caught by a centralized middleware
 that logs the problem and returns a JSON response with a clear message.
+
+## Testing
+
+Run `npm test` to execute the Playwright unit and integration tests. The tests start the server using an in-memory SQLite database.
