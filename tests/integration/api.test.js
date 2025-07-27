@@ -224,3 +224,18 @@ test('metrics endpoint responds', async () => {
   expect(typeof body.totalErrors).toBe('number');
   expect(typeof body.avgResponseTime).toBe('number');
 });
+
+test('user type filtering works', async () => {
+  await context.post('/auth/register', {
+    data: { name: 'Artist', username: 'artist', password: 'pw', is_artist: true }
+  });
+  await context.post('/auth/register', {
+    data: { name: 'Regular', username: 'regular', password: 'pw', is_artist: false }
+  });
+  const arts = await context.get('/users?type=artist');
+  const artList = await arts.json();
+  expect(artList.every(u => u.is_artist === 1)).toBeTruthy();
+  const fans = await context.get('/users?type=user');
+  const fanList = await fans.json();
+  expect(fanList.every(u => u.is_artist === 0)).toBeTruthy();
+});

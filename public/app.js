@@ -26,6 +26,7 @@ function Nav({ auth }) {
     <nav className="bg-blue-800 text-white p-2 flex flex-wrap space-x-4">
       <Link className="hover:underline" to="/">Home</Link>
       <Link className="hover:underline" to="/artists">Artists</Link>
+      <Link className="hover:underline" to="/users">Users</Link>
       <Link className="hover:underline" to="/media">Media</Link>
       <Link className="hover:underline" to="/messages">Messages</Link>
       <Link className="hover:underline" to="/board">Board</Link>
@@ -56,6 +57,7 @@ function Home() {
 function SignIn({ auth }) {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [isArtist, setIsArtist] = React.useState(false);
   const nav = useNavigate();
 
   const login = async () => {
@@ -77,7 +79,7 @@ function SignIn({ auth }) {
     const res = await fetch('/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: username, username, password })
+      body: JSON.stringify({ name: username, username, password, is_artist: isArtist })
     });
     const data = await res.json();
     if (data.token) {
@@ -93,6 +95,11 @@ function SignIn({ auth }) {
       <div>
         <input className="border p-1 mr-2" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
         <input className="border p-1 mr-2" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+      </div>
+      <div className="space-x-2">
+        <label>
+          <input type="checkbox" checked={isArtist} onChange={e => setIsArtist(e.target.checked)} /> Artist profile
+        </label>
       </div>
       <div>
         <button className="bg-green-600 text-white px-2 py-1 mr-2" onClick={login}>Login</button>
@@ -215,7 +222,7 @@ function EditProfile({ auth }) {
 function Artists() {
   const [users, setUsers] = React.useState([]);
   React.useEffect(() => {
-    fetch('/users')
+    fetch('/users?type=artist')
       .then(r => r.json())
       .then(setUsers);
   }, []);
@@ -234,6 +241,74 @@ function Artists() {
           </div>
         </Link>
       ))}
+    </div>
+  );
+}
+
+function UsersPage() {
+  const [users, setUsers] = React.useState([]);
+  React.useEffect(() => {
+    fetch('/users?type=user')
+      .then(r => r.json())
+      .then(setUsers);
+  }, []);
+  return (
+    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+      {users.map(u => (
+        <Link key={u.id} to={`/users/${u.id}`} className="border p-2 bg-white flex items-center space-x-2 hover:bg-gray-100">
+          {u.avatar_id ? (
+            <img className="w-12 h-12 object-cover rounded-full" src={`/media/${u.avatar_id}`} alt="avatar" />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
+          )}
+          <div>
+            <div className="font-bold">{u.name}</div>
+            <div className="text-sm">@{u.username}</div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function UserDetail() {
+  const { id } = useParams();
+  const [user, setUser] = React.useState(null);
+  React.useEffect(() => {
+    fetch(`/users/${id}`)
+      .then(r => r.json())
+      .then(setUser);
+  }, [id]);
+  if (!user) return <div className="p-4">Loading...</div>;
+  return (
+    <div className="p-4 space-y-4">
+      <Link className="text-blue-600 underline" to="/users">Back to users</Link>
+      <div className="flex items-center space-x-4">
+        {user.avatar_id ? (
+          <img className="w-20 h-20 object-cover rounded-full" src={`/media/${user.avatar_id}`} alt="avatar" />
+        ) : (
+          <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
+        )}
+        <div>
+          <div className="text-xl font-bold">{user.name}</div>
+          <div className="text-sm mb-2">@{user.username}</div>
+        </div>
+      </div>
+      <div>Email: {user.email || 'N/A'}</div>
+      <div>Bio: {user.bio || 'N/A'}</div>
+      <div>Social: {user.social || 'N/A'}</div>
+      <div>
+        <div className="font-bold mb-1">Media</div>
+        <MediaGallery userId={id} />
+      </div>
+      <div>
+        <div className="font-bold mb-1">Merch</div>
+        <MerchSection userId={id} />
+      </div>
+      <div>
+        <div className="font-bold mb-1">Upcoming Shows</div>
+        <ShowsSection userId={id} />
+      </div>
     </div>
   );
 }
@@ -586,6 +661,8 @@ function App() {
           <Route path="/profile/edit" element={<EditProfile auth={auth} />} />
           <Route path="/artists" element={<Artists />} />
           <Route path="/artists/:id" element={<ArtistDetail />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/users/:id" element={<UserDetail />} />
           <Route path="/messages" element={<Messages auth={auth} />} />
           <Route path="/media" element={<Media auth={auth} />} />
           <Route path="/board" element={<Board auth={auth} />} />

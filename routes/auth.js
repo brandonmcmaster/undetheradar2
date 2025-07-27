@@ -17,17 +17,22 @@ router.post(
   body('email').optional().isEmail().normalizeEmail(),
   body('bio').optional().escape(),
   body('social').optional().escape(),
+  body('is_artist').optional().isBoolean().toBoolean(),
   validate,
   (req, res, next) => {
-    const { name, username, password, email, bio, social } = req.body;
+    const { name, username, password, email, bio, social, is_artist } = req.body;
     const hashed = bcrypt.hashSync(password, 10);
     const stmt =
-      'INSERT INTO users(name, username, password, email, bio, social) VALUES(?,?,?,?,?,?)';
-    db.run(stmt, [name, username, hashed, email, bio, social], function (err) {
-      if (err) return next(err);
-      const token = jwt.sign({ id: this.lastID, username }, SECRET);
-      res.json({ token, id: this.lastID });
-    });
+      'INSERT INTO users(name, username, password, email, bio, social, is_artist) VALUES(?,?,?,?,?,?,?)';
+    db.run(
+      stmt,
+      [name, username, hashed, email, bio, social, is_artist ? 1 : 0],
+      function (err) {
+        if (err) return next(err);
+        const token = jwt.sign({ id: this.lastID, username }, SECRET);
+        res.json({ token, id: this.lastID });
+      }
+    );
   }
 );
 

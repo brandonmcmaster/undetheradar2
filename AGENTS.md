@@ -12,6 +12,7 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 
 ## Database
 - New tables: `shows`, `merch`, `board_posts`, `board_reactions` and `board_comments`.
+- The `users` table now includes an `is_artist` flag to distinguish artist and regular profiles.
 
 ## Media uploads
 - Files are stored in the `uploads/` directory.

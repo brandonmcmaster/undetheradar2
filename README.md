@@ -22,9 +22,9 @@ to:
 The backend is built with Node.js, Express and SQLite using CommonJS modules and
 minimal dependencies. Structured logs are produced with **Pino**. Current endpoints include:
 
-- `POST /auth/register` – create an account
+- `POST /auth/register` – create an account (set `is_artist` to `true` for artist profiles)
 - `POST /auth/login` – obtain a JWT
-- `GET /users` – list user profiles
+- `GET /users` – list user profiles (`?type=artist` or `?type=user` to filter)
 - `POST /users` – update the authenticated user's profile
 - `GET /users/:id` – fetch a user by id
 - `POST /users/avatar` – upload a profile picture (requires authentication)
@@ -60,11 +60,11 @@ Once running, open [http://localhost:3000](http://localhost:3000) to view the
 React interface. All frontend libraries (React, React Router, Tailwind and
 Babel) are included in the repository under `public/vendor` so the site works
 without hitting external CDNs. The UI embraces a retro internet vibe and
-provides pages for signing in, browsing artists (with individual artist profiles), viewing your profile and editing it at `/profile/edit`,
-exchanging messages and viewing uploaded media. Placeholders for the upcoming
+ provides pages for signing in, browsing artists and regular users (each with individual profiles), viewing your profile and editing it at `/profile/edit`,
+ exchanging messages and viewing uploaded media. Placeholders for the upcoming
 show calendar and merch shop are also included.
 Swagger documentation is available at [http://localhost:3000/docs](http://localhost:3000/docs).
-Click an artist on the Artists page to view their profile at `/artists/:id`.
+Click a profile on the Artists or Users page to view details at `/artists/:id` or `/users/:id`.
 
 ## Security
 
@@ -125,7 +125,7 @@ curl -X POST http://localhost:3000/auth/login \
 
 ### `/users`
 
-- `GET /users` – list all users
+- `GET /users` – list users (`?type=artist` or `?type=user` to filter)
 - `POST /users` – update the authenticated user's profile
 - `GET /users/:id` – fetch a user by id
 - `POST /users/avatar` – upload or update your profile picture
