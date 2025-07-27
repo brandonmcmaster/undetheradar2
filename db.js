@@ -65,6 +65,26 @@ const init = () => {
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
     )`);
 
+    db.run(`CREATE TABLE IF NOT EXISTS board_reactions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      post_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      reaction INTEGER NOT NULL,
+      UNIQUE(post_id, user_id),
+      FOREIGN KEY(post_id) REFERENCES board_posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS board_comments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      post_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      content TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(post_id) REFERENCES board_posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+    )`);
+
     // Ensure media table has all columns when upgrading from older versions
     db.all('PRAGMA table_info(media)', [], (err, cols) => {
       if (err) return;
