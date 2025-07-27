@@ -145,3 +145,60 @@ test('health check works', async () => {
   const body = await res.json();
   expect(body.status).toBe('ok');
 });
+
+test('shows endpoints work', async () => {
+  const reg = await context.post('/auth/register', {
+    data: { name: 'Greg', username: 'greg', password: 'pw' }
+  });
+  const { token, id } = await reg.json();
+
+  const create = await context.post('/shows', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { venue: 'The Spot', date: '2030-01-01', description: 'Party' }
+  });
+  expect(create.ok()).toBeTruthy();
+  const { id: showId } = await create.json();
+
+  const all = await context.get('/shows');
+  expect(all.ok()).toBeTruthy();
+  const list = await all.json();
+  expect(list.find(s => s.id === showId)).toBeTruthy();
+
+  const userShows = await context.get(`/shows/user/${id}`);
+  expect(userShows.ok()).toBeTruthy();
+  const userList = await userShows.json();
+  expect(userList.find(s => s.id === showId)).toBeTruthy();
+});
+
+test('merch endpoints work', async () => {
+  const reg = await context.post('/auth/register', {
+    data: { name: 'Hank', username: 'hank', password: 'pw' }
+  });
+  const { token, id } = await reg.json();
+
+  const create = await context.post('/merch', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { product_name: 'Tee', price: 10.5, stock: 5 }
+  });
+  expect(create.ok()).toBeTruthy();
+  const { id: merchId } = await create.json();
+
+  const all = await context.get('/merch');
+  expect(all.ok()).toBeTruthy();
+  const list = await all.json();
+  expect(list.find(m => m.id === merchId)).toBeTruthy();
+
+  const userMerch = await context.get(`/merch/user/${id}`);
+  expect(userMerch.ok()).toBeTruthy();
+  const userList = await userMerch.json();
+  expect(userList.find(m => m.id === merchId)).toBeTruthy();
+});
+
+test('metrics endpoint responds', async () => {
+  const res = await context.get('/metrics');
+  expect(res.ok()).toBeTruthy();
+  const body = await res.json();
+  expect(body.totalRequests).toBeGreaterThan(0);
+  expect(typeof body.totalErrors).toBe('number');
+  expect(typeof body.avgResponseTime).toBe('number');
+});
