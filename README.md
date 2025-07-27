@@ -1,8 +1,15 @@
 # Under the Radar API
 
-This repository contains the starting API for **Under the Radar**, an old‑school
-community site geared toward underground musicians. The project aims to provide
-artists with a simple place to:
+Under The Radar is a grassroots, artist-first platform for underground
+musicians. It's built for those who care more about real connection than
+gaming algorithms. We reject engagement farming and corporate control.
+Musicians own their profiles, connect directly with fans and collaborate with
+one another on their own terms.
+
+Our mission is to create the premier place where independent artists can
+thrive, connect and get paid—without selling out. This repository houses the
+API that powers the platform. It aims to provide artists with a simple place
+to:
 
 - Create and maintain personal profiles
 - Upload photos and videos
