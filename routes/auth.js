@@ -11,9 +11,12 @@ const SECRET = process.env.JWT_SECRET || 'secret';
 // Register a new user
 router.post(
   '/register',
-  body('name').trim().notEmpty(),
-  body('username').trim().notEmpty(),
+  body('name').trim().notEmpty().escape(),
+  body('username').trim().notEmpty().escape(),
   body('password').notEmpty(),
+  body('email').optional().isEmail().normalizeEmail(),
+  body('bio').optional().escape(),
+  body('social').optional().escape(),
   validate,
   (req, res, next) => {
     const { name, username, password, email, bio, social } = req.body;
@@ -31,7 +34,7 @@ router.post(
 // Login existing user
 router.post(
   '/login',
-  body('username').trim().notEmpty(),
+  body('username').trim().notEmpty().escape(),
   body('password').notEmpty(),
   validate,
   (req, res, next) => {

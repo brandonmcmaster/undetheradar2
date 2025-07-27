@@ -17,10 +17,10 @@ router.get('/', (req, res) => {
 router.post(
   '/',
   authenticate,
-  body('name').optional().notEmpty(),
-  body('email').optional().isEmail(),
-  body('bio').optional(),
-  body('social').optional(),
+  body('name').optional().notEmpty().escape(),
+  body('email').optional().isEmail().normalizeEmail(),
+  body('bio').optional().escape(),
+  body('social').optional().escape(),
   validate,
   (req, res, next) => {
     const { name, email, bio, social } = req.body;

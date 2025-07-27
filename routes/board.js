@@ -42,7 +42,7 @@ router.get('/user/:id', param('id').isInt(), validate, (req, res, next) => {
 router.post(
   '/',
   authenticate,
-  body('content').trim().notEmpty(),
+  body('content').trim().notEmpty().escape(),
   validate,
   (req, res, next) => {
     const { content } = req.body;
@@ -95,7 +95,7 @@ router.post(
   '/:id/comments',
   authenticate,
   param('id').isInt(),
-  body('content').trim().notEmpty(),
+  body('content').trim().notEmpty().escape(),
   validate,
   (req, res, next) => {
     const { content } = req.body;

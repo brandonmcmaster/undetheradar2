@@ -25,7 +25,7 @@ router.get('/user/:id', param('id').isInt(), validate, (req, res, next) => {
 router.post(
   '/',
   authenticate,
-  body('product_name').trim().notEmpty(),
+  body('product_name').trim().notEmpty().escape(),
   body('price').isFloat(),
   body('stock').optional().isInt(),
   validate,
