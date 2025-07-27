@@ -14,9 +14,13 @@ artists with a simple place to:
 The backend is built with Node.js, Express and SQLite using CommonJS modules and
 minimal dependencies. Current endpoints include:
 
-- `GET /users` and `POST /users` – manage user profiles
-- `GET /messages` and `POST /messages` – send direct messages
-- `GET /media` and `POST /media` – upload and list media files
+- `POST /auth/register` – create an account
+- `POST /auth/login` – obtain a JWT
+- `GET /users` – list user profiles
+- `POST /users` – update the authenticated user's profile
+- `GET /users/:id` – fetch a user by id
+- `GET /messages` and `POST /messages` – list and send messages (sending requires authentication)
+- `GET /media` and `POST /media` – list and upload media files (upload requires authentication)
 
 Future additions will cover show listings, merch management and the message
 board. Everything is intentionally straightforward with no ranking algorithms.
@@ -49,41 +53,56 @@ root containing the required tables.
 
 ## API Endpoints
 
+### `/auth`
+
+- `POST /auth/register` – register a new user
+- `POST /auth/login` – log in and receive a token
+
+Example registration request:
+
+```bash
+curl -X POST http://localhost:3000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Alice","username":"alice","password":"secret"}'
+```
+
+Example login request:
+
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"alice","password":"secret"}'
+```
+
 ### `/users`
 
 - `GET /users` – list all users
-- `POST /users` – create a new user
+- `POST /users` – update the authenticated user's profile
 - `GET /users/:id` – fetch a user by id
-
-Example request to create a user:
-
-```bash
-curl -X POST http://localhost:3000/users \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Alice"}'
-```
 
 ### `/messages`
 
 - `GET /messages` – list all messages
-- `POST /messages` – send a new message
+- `POST /messages` – send a new message (requires authentication)
 
 Example request to send a message:
 
 ```bash
 curl -X POST http://localhost:3000/messages \
+  -H "Authorization: Bearer <TOKEN>" \
   -H "Content-Type: application/json" \
-  -d '{"sender_id":1,"receiver_id":2,"content":"Hello"}'
+  -d '{"receiver_id":2,"content":"Hello"}'
 ```
 
 ### `/media`
 
 - `GET /media` – list uploaded files
-- `POST /media` – upload a file using `multipart/form-data`
+- `POST /media` – upload a file using `multipart/form-data` (requires authentication)
 
 Example request to upload a file:
 
 ```bash
 curl -X POST http://localhost:3000/media \
+  -H "Authorization: Bearer <TOKEN>" \
   -F file=@path/to/image.png
 ```
