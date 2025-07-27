@@ -37,6 +37,10 @@ npm start
 
 The server listens on port `3000` by default.
 
+Once running, open [http://localhost:3000](http://localhost:3000) to use the
+included demo front end. The interface lets you create users, send messages and
+upload media using the API endpoints described below.
+
 ## Database
 
 The API uses **SQLite** for data storage. When you start the server for the
