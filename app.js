@@ -8,6 +8,7 @@ const usersRouter = require('./routes/users');
 const messagesRouter = require('./routes/messages');
 const mediaRouter = require('./routes/media');
 const authRouter = require('./routes/auth');
+const errorHandler = require('./middleware/error');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +33,8 @@ app.use('/auth', authRouter);
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

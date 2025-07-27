@@ -125,3 +125,10 @@ Uploaded files are stored in the `uploads` directory and scanned with
 `clamscan` when available. Only JPEG, PNG, MP3 and MP4 files up to 10 MB are
 accepted. The database records the original filename, MIME type, size and the
 user who uploaded each file.
+
+## Validation and Error Handling
+
+All incoming requests now go through `express-validator` checks. For example,
+IDs must be integers and required fields like usernames may not be empty.
+Any validation issues or other errors are caught by a centralized middleware
+that logs the problem and returns a JSON response with a clear message.
