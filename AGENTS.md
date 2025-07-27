@@ -30,3 +30,4 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 
 ## Testing
 - Run `npm start` to verify that the server starts without errors.
+- Write tests for any new features and confirm they pass with `npm test`.
