@@ -49,9 +49,11 @@ Once running, open [http://localhost:3000](http://localhost:3000) to view the
 React interface. All frontend libraries (React, React Router, Tailwind and
 Babel) are included in the repository under `public/vendor` so the site works
 without hitting external CDNs. The UI embraces a retro internet vibe and
-provides pages for signing in, browsing artists, managing your profile,
+provides pages for signing in, browsing artists (with individual artist profiles), managing your profile,
 exchanging messages and viewing uploaded media. Placeholders for the upcoming
 show calendar and merch shop are also included.
+Click an artist on the Artists page to view their profile at `/artists/:id`.
+
 
 ## Database
 
