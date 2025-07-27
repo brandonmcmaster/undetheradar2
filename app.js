@@ -13,6 +13,7 @@ const mediaRouter = require('./routes/media');
 const authRouter = require('./routes/auth');
 const showsRouter = require('./routes/shows');
 const merchRouter = require('./routes/merch');
+const boardRouter = require('./routes/board');
 const errorHandler = require('./middleware/error');
 
 const app = express();
@@ -37,6 +38,7 @@ app.use('/media', mediaRouter);
 app.use('/auth', authRouter);
 app.use('/shows', showsRouter);
 app.use('/merch', merchRouter);
+app.use('/board', boardRouter);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
