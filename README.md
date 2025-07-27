@@ -1,6 +1,25 @@
-# Unde the Radar API
+# Under the Radar API
 
-This project provides a basic Express server with modules for user profiles, messaging, and media uploads.
+This repository contains the starting API for **Under the Radar**, an old‑school
+community site geared toward underground musicians. The project aims to provide
+artists with a simple place to:
+
+- Create and maintain personal profiles
+- Upload photos and videos
+- Stream and share their music
+- Post show dates
+- Sell merchandise directly
+- Participate in a message board without algorithmic feeds
+
+The backend is built with Node.js, Express and SQLite using CommonJS modules and
+minimal dependencies. Current endpoints include:
+
+- `GET /users` and `POST /users` – manage user profiles
+- `GET /messages` and `POST /messages` – send direct messages
+- `GET /media` and `POST /media` – upload and list media files
+
+Future additions will cover show listings, merch management and the message
+board. Everything is intentionally straightforward with no ranking algorithms.
 
 ## Setup
 
