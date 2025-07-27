@@ -47,9 +47,10 @@ The server listens on port `3000` by default.
 
 Once running, open [http://localhost:3000](http://localhost:3000) to view the
 new React interface. The UI is built with **Tailwind CSS** and embraces a retro
-internet vibe. It provides pages for signing in, browsing artists, managing
-your profile, exchanging messages and viewing uploaded media. Placeholders for
-the upcoming show calendar and merch shop are also included.
+internet vibe. All screens are implemented as small components in the
+`public/components` folder. A new home page now greets visitors and links to the
+artist browser, show calendar, media gallery and merch shop. Additional pages
+cover sign in, profile management, messaging and media uploads.
 
 ## Database
 

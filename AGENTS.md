@@ -22,6 +22,8 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 
 ## Frontend
 - The `public` folder now contains a small React app served via CDN.
+- Individual pages live in `public/components` and are loaded directly in the
+  browser via Babel.
 - Tailwind CSS provides styling with a retro aesthetic.
 - Keep frontend JavaScript indented with 2 spaces like the backend.
 
