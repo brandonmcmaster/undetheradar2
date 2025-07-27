@@ -7,7 +7,12 @@ const init = () => {
   db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL
+      name TEXT NOT NULL,
+      username TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL,
+      email TEXT,
+      bio TEXT,
+      social TEXT
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS messages (

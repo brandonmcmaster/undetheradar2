@@ -6,6 +6,7 @@ const { init } = require('./db');
 const usersRouter = require('./routes/users');
 const messagesRouter = require('./routes/messages');
 const mediaRouter = require('./routes/media');
+const authRouter = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,7 @@ init();
 app.use('/users', usersRouter);
 app.use('/messages', messagesRouter);
 app.use('/media', mediaRouter);
+app.use('/auth', authRouter);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

@@ -8,9 +8,18 @@
 <body>
   <h1>Under the Radar</h1>
   <section>
-    <h2>Create User</h2>
-    <input id="user-name" placeholder="Name">
-    <button id="create-user">Create</button>
+    <h2>Register</h2>
+    <input id="reg-name" placeholder="Name">
+    <input id="reg-username" placeholder="Username">
+    <input id="reg-password" placeholder="Password" type="password">
+    <button id="register">Register</button>
+  </section>
+  <section>
+    <h2>Login</h2>
+    <input id="login-username" placeholder="Username">
+    <input id="login-password" placeholder="Password" type="password">
+    <button id="login">Login</button>
+    <p id="token-display"></p>
   </section>
   <section>
     <h2>Users</h2>
@@ -19,7 +28,6 @@
   </section>
   <section>
     <h2>Send Message</h2>
-    <input id="sender-id" placeholder="Sender ID" type="number">
     <input id="receiver-id" placeholder="Receiver ID" type="number">
     <input id="message-content" placeholder="Content">
     <button id="send-message">Send</button>
