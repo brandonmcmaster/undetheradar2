@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const db = new sqlite3.Database(path.join(__dirname, 'app.db'));
+const dbFile = process.env.DB_FILE || path.join(__dirname, 'app.db');
+const db = new sqlite3.Database(dbFile);
 
 // Initialize tables
 const init = () => {
