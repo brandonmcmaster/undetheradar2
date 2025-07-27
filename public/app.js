@@ -37,7 +37,10 @@ function Nav({ auth }) {
           <button className="ml-auto" onClick={auth.clear}>Logout</button>
         </React.Fragment>
       ) : (
-        <Link className="ml-auto hover:underline" to="/signin">Sign In</Link>
+        <React.Fragment>
+          <Link className="ml-auto hover:underline" to="/signin">Sign In</Link>
+          <Link className="hover:underline" to="/register">Register</Link>
+        </React.Fragment>
       )}
     </nav>
   );
@@ -56,7 +59,6 @@ function Home() {
 function SignIn({ auth }) {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [profileType, setProfileType] = React.useState('user');
   const nav = useNavigate();
 
   const login = async () => {
@@ -74,12 +76,33 @@ function SignIn({ auth }) {
     }
   };
 
+  return (
+    <div className="p-4 space-y-2">
+      <div>
+        <input className="border p-1 mr-2" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+        <input className="border p-1 mr-2" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+      </div>
+      <div>
+        <button className="bg-green-600 text-white px-2 py-1 mr-2" onClick={login}>Login</button>
+        <Link className="text-blue-600 underline" to="/register">Register</Link>
+      </div>
+    </div>
+  );
+}
+
+function Register({ auth }) {
+  const [name, setName] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [profileType, setProfileType] = React.useState('user');
+  const nav = useNavigate();
+
   const register = async () => {
     const res = await fetch('/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: username,
+        name,
         username,
         password,
         is_artist: profileType === 'artist'
@@ -97,6 +120,7 @@ function SignIn({ auth }) {
   return (
     <div className="p-4 space-y-2">
       <div>
+        <input className="border p-1 mr-2" placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
         <input className="border p-1 mr-2" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
         <input className="border p-1 mr-2" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
       </div>
@@ -123,7 +147,6 @@ function SignIn({ auth }) {
         </label>
       </div>
       <div>
-        <button className="bg-green-600 text-white px-2 py-1 mr-2" onClick={login}>Login</button>
         <button className="bg-blue-600 text-white px-2 py-1" onClick={register}>Register</button>
       </div>
     </div>
@@ -682,6 +705,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn auth={auth} />} />
+          <Route path="/register" element={<Register auth={auth} />} />
           <Route path="/profile" element={<Profile auth={auth} />} />
           <Route path="/profile/edit" element={<EditProfile auth={auth} />} />
           <Route path="/browse" element={<Browse />} />
