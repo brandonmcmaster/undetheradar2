@@ -209,6 +209,21 @@
         "responses": {"200": {"description": "File"}}
       }
     },
+    "/profile-media": {
+      "post": {
+        "summary": "Upload profile picture or video",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {"required": true, "content": {"multipart/form-data": {"schema": {"type": "object", "properties": {"file": {"type": "string", "format": "binary"}}}}}},
+        "responses": {"200": {"description": "Created"}}
+      }
+    },
+    "/profile-media/user/{id}": {
+      "get": {
+        "summary": "Profile media for user",
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"200": {"description": "Files"}}
+      }
+    },
     "/shows": {
       "get": {"summary": "List shows", "responses": {"200": {"description": "Shows"}}},
       "post": {"summary": "Create a show", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["venue", "date"], "properties": {"venue": {"type": "string"}, "date": {"type": "string"}, "description": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
