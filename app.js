@@ -3,6 +3,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const { init } = require('./db');
+const logger = require('./logger');
+const requestLogger = require('./middleware/logger');
+const metrics = require('./metrics');
 
 const usersRouter = require('./routes/users');
 const messagesRouter = require('./routes/messages');
@@ -16,6 +19,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
+app.use(requestLogger);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Ensure uploads directory exists
@@ -34,6 +38,14 @@ app.use('/auth', authRouter);
 app.use('/shows', showsRouter);
 app.use('/merch', merchRouter);
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
+app.get('/metrics', (req, res) => {
+  res.json(metrics.getMetrics());
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -43,7 +55,7 @@ app.use(errorHandler);
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    logger.info(`Server is running on port ${PORT}`);
   });
 }
 

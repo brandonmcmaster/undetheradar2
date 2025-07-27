@@ -12,7 +12,7 @@ artists with a simple place to:
 - Participate in a message board without algorithmic feeds
 
 The backend is built with Node.js, Express and SQLite using CommonJS modules and
-minimal dependencies. Current endpoints include:
+minimal dependencies. Structured logs are produced with **Pino**. Current endpoints include:
 
 - `POST /auth/register` – create an account
 - `POST /auth/login` – obtain a JWT
@@ -53,6 +53,12 @@ provides pages for signing in, browsing artists (with individual artist profiles
 exchanging messages and viewing uploaded media. Placeholders for the upcoming
 show calendar and merch shop are also included.
 Click an artist on the Artists page to view their profile at `/artists/:id`.
+
+## Logging and Monitoring
+
+All requests are logged in JSON format using **Pino** along with a unique request ID.
+The `/metrics` endpoint exposes basic statistics like total requests, errors and
+average response time.
 
 
 ## Database
@@ -146,6 +152,11 @@ user who uploaded each file.
 - `GET /merch` – list all merch items
 - `GET /merch/user/:id` – merch for a specific user
 - `POST /merch` – create a merch item (requires authentication)
+
+### Misc
+
+- `GET /health` – simple health check returning `{ "status": "ok" }`
+- `GET /metrics` – basic metrics including total requests, errors and average response time
 
 ## Validation and Error Handling
 

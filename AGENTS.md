@@ -6,6 +6,7 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 - Use 2-space indentation in JavaScript files.
 - Stick to CommonJS `require`/`module.exports` syntax.
 - Keep dependencies minimal.
+- Use **Pino** for structured logging; all requests should include a request ID.
 - Foreign key constraints are enabled via `PRAGMA foreign_keys = ON`.
 
 ## Database

@@ -85,3 +85,10 @@ test('messaging and media upload', async () => {
   const media = await upload.json();
   expect(media.id).toBeGreaterThan(0);
 });
+
+test('health check works', async () => {
+  const res = await context.get('/health');
+  expect(res.ok()).toBeTruthy();
+  const body = await res.json();
+  expect(body.status).toBe('ok');
+});
