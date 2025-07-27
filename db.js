@@ -97,6 +97,15 @@ const init = () => {
       add('size', 'INTEGER');
       add('user_id', 'INTEGER');
     });
+
+    // Ensure users table has avatar_id column
+    db.all('PRAGMA table_info(users)', [], (err, cols) => {
+      if (err) return;
+      const names = cols.map(c => c.name);
+      if (!names.includes('avatar_id')) {
+        db.run('ALTER TABLE users ADD COLUMN avatar_id INTEGER');
+      }
+    });
   });
 };
 

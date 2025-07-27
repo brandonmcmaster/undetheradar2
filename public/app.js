@@ -104,6 +104,7 @@ function SignIn({ auth }) {
 
 function Profile({ auth }) {
   const [profile, setProfile] = React.useState(null);
+  const [avatarFile, setAvatarFile] = React.useState(null);
   React.useEffect(() => {
     if (!auth.token || !auth.userId) return;
     fetch(`/users/${auth.userId}`)
@@ -111,14 +112,30 @@ function Profile({ auth }) {
       .then(setProfile);
   }, [auth]);
 
+  const uploadAvatar = () => {
+    if (!avatarFile) return;
+    const data = new FormData();
+    data.append('avatar', avatarFile);
+    fetch('/users/avatar', { method: 'POST', headers: { Authorization: `Bearer ${auth.token}` }, body: data })
+      .then(r => r.json())
+      .then(p => setProfile(prev => ({ ...prev, avatar_id: p.avatar_id })));
+  };
+
   if (!auth.token) return <div className="p-4">Please sign in.</div>;
   if (!profile) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="space-y-1">
-        <div>Name: {profile.name}</div>
-        <div>Username: {profile.username}</div>
+    <div className="p-4 space-y-6 max-w-3xl mx-auto">
+      <div className="flex flex-col items-center space-y-2">
+        {profile.avatar_id ? (
+          <img className="w-32 h-32 object-cover rounded-full" src={`/media/${profile.avatar_id}`} alt="avatar" />
+        ) : (
+          <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center">No Image</div>
+        )}
+        <input type="file" onChange={e => setAvatarFile(e.target.files[0])} />
+        <button className="bg-blue-600 text-white px-2 py-1" onClick={uploadAvatar}>Upload Avatar</button>
+        <div className="text-xl font-bold">{profile.name}</div>
+        <div className="text-sm">@{profile.username}</div>
         <div>Email: {profile.email || 'N/A'}</div>
         <div>Bio: {profile.bio || 'N/A'}</div>
       </div>
@@ -148,9 +165,16 @@ function Artists() {
   return (
     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
       {users.map(u => (
-        <Link key={u.id} to={`/artists/${u.id}`} className="border p-2 bg-white block hover:bg-gray-100">
-          <div className="font-bold">{u.name}</div>
-          <div className="text-sm">@{u.username}</div>
+        <Link key={u.id} to={`/artists/${u.id}`} className="border p-2 bg-white flex items-center space-x-2 hover:bg-gray-100">
+          {u.avatar_id ? (
+            <img className="w-12 h-12 object-cover rounded-full" src={`/media/${u.avatar_id}`} alt="avatar" />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
+          )}
+          <div>
+            <div className="font-bold">{u.name}</div>
+            <div className="text-sm">@{u.username}</div>
+          </div>
         </Link>
       ))}
     </div>
@@ -169,8 +193,17 @@ function ArtistDetail() {
   return (
     <div className="p-4 space-y-4">
       <Link className="text-blue-600 underline" to="/artists">Back to artists</Link>
-      <div className="text-xl font-bold">{user.name}</div>
-      <div className="text-sm mb-2">@{user.username}</div>
+      <div className="flex items-center space-x-4">
+        {user.avatar_id ? (
+          <img className="w-20 h-20 object-cover rounded-full" src={`/media/${user.avatar_id}`} alt="avatar" />
+        ) : (
+          <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
+        )}
+        <div>
+          <div className="text-xl font-bold">{user.name}</div>
+          <div className="text-sm mb-2">@{user.username}</div>
+        </div>
+      </div>
       <div>Email: {user.email || 'N/A'}</div>
       <div>Bio: {user.bio || 'N/A'}</div>
       <div>Social: {user.social || 'N/A'}</div>
