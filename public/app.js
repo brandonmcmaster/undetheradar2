@@ -28,6 +28,7 @@ function Nav({ auth }) {
       <Link className="hover:underline" to="/artists">Artists</Link>
       <Link className="hover:underline" to="/media">Media</Link>
       <Link className="hover:underline" to="/messages">Messages</Link>
+      <Link className="hover:underline" to="/board">Board</Link>
       <Link className="hover:underline" to="/shows">Shows</Link>
       <Link className="hover:underline" to="/merch">Merch</Link>
       {auth.token ? (
@@ -339,6 +340,64 @@ function ShowsSection({ userId }) {
   );
 }
 
+function Board({ auth }) {
+  const [posts, setPosts] = React.useState([]);
+  const [content, setContent] = React.useState('');
+
+  const load = () => {
+    fetch('/board')
+      .then(r => r.json())
+      .then(setPosts);
+  };
+
+  React.useEffect(load, []);
+
+  const submit = () => {
+    if (!content || !auth.token) return alert('Sign in and enter content');
+    fetch('/board', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.token}`
+      },
+      body: JSON.stringify({ content })
+    })
+      .then(r => r.json())
+      .then(() => {
+        setContent('');
+        load();
+      });
+  };
+
+  return (
+    <div className="p-4 space-y-2">
+      {auth.token && (
+        <div>
+          <input
+            className="border p-1 mr-2"
+            placeholder="New post"
+            value={content}
+            onChange={e => setContent(e.target.value)}
+          />
+          <button className="bg-blue-600 text-white px-2 py-1" onClick={submit}>
+            Post
+          </button>
+        </div>
+      )}
+      <div className="space-y-2">
+        {posts.map(p => (
+          <div key={p.id} className="border p-2 bg-white">
+            <div className="text-sm text-gray-600">
+              {p.username} - {new Date(p.created_at).toLocaleString()}
+            </div>
+            <div>{p.content}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Placeholder({ text }) {
   return <div className="p-4">{text} coming soon!</div>;
 }
@@ -357,6 +416,7 @@ function App() {
           <Route path="/artists/:id" element={<ArtistDetail />} />
           <Route path="/messages" element={<Messages auth={auth} />} />
           <Route path="/media" element={<Media auth={auth} />} />
+          <Route path="/board" element={<Board auth={auth} />} />
           <Route path="/shows" element={<Placeholder text="Show calendar" />} />
           <Route path="/merch" element={<Placeholder text="Merch shop" />} />
         </Routes>

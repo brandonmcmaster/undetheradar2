@@ -10,6 +10,7 @@ artists with a simple place to:
 - Post show dates
 - Sell merchandise directly
 - Participate in a message board without algorithmic feeds
+- Post updates to a shared bulletin board
 
 The backend is built with Node.js, Express and SQLite using CommonJS modules and
 minimal dependencies. Structured logs are produced with **Pino**. Current endpoints include:
@@ -152,6 +153,12 @@ user who uploaded each file.
 - `GET /merch` – list all merch items
 - `GET /merch/user/:id` – merch for a specific user
 - `POST /merch` – create a merch item (requires authentication)
+
+### `/board`
+
+- `GET /board` – list all board posts
+- `GET /board/user/:id` – posts by a specific user
+- `POST /board` – create a new board post (requires authentication)
 
 ### Misc
 

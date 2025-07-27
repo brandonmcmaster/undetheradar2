@@ -86,6 +86,22 @@ test('messaging and media upload', async () => {
   expect(media.id).toBeGreaterThan(0);
 });
 
+test('board post creation', async () => {
+  const reg = await context.post('/auth/register', {
+    data: { name: 'Dana', username: 'dana', password: 'pw' }
+  });
+  const { token } = await reg.json();
+  const post = await context.post('/board', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { content: 'Hello board' }
+  });
+  expect(post.ok()).toBeTruthy();
+  const all = await context.get('/board');
+  expect(all.ok()).toBeTruthy();
+  const items = await all.json();
+  expect(items.find(p => p.content === 'Hello board')).toBeTruthy();
+});
+
 test('health check works', async () => {
   const res = await context.get('/health');
   expect(res.ok()).toBeTruthy();
