@@ -31,10 +31,10 @@ function Nav({ auth }) {
       <Link className="hover:underline" to="/shows">Shows</Link>
       <Link className="hover:underline" to="/merch">Merch</Link>
       {auth.token ? (
-        <>
+        <React.Fragment>
           <Link className="hover:underline" to="/profile">Profile</Link>
           <button className="ml-auto" onClick={auth.clear}>Logout</button>
-        </>
+        </React.Fragment>
       ) : (
         <Link className="ml-auto hover:underline" to="/signin">Sign In</Link>
       )}
