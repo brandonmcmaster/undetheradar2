@@ -19,7 +19,9 @@ minimal dependencies. Current endpoints include:
 - `GET /users` – list user profiles
 - `POST /users` – update the authenticated user's profile
 - `GET /users/:id` – fetch a user by id
-- `GET /messages` and `POST /messages` – list and send messages (sending requires authentication)
+- `GET /messages/inbox` – read your incoming messages (requires authentication)
+- `GET /messages/outbox` – read your sent messages (requires authentication)
+- `POST /messages` – send a new message (requires authentication)
 - `GET /media` – list uploaded files
 - `POST /media` – upload a file (requires authentication)
 - `GET /media/:id` – stream or download a specific file
@@ -95,7 +97,8 @@ curl -X POST http://localhost:3000/auth/login \
 
 ### `/messages`
 
-- `GET /messages` – list all messages
+- `GET /messages/inbox` – list messages sent **to** the authenticated user
+- `GET /messages/outbox` – list messages **from** the authenticated user
 - `POST /messages` – send a new message (requires authentication)
 
 Example request to send a message:
