@@ -62,6 +62,7 @@ without hitting external CDNs. The UI embraces a retro internet vibe and
 provides pages for signing in, browsing artists (with individual artist profiles), managing your profile,
 exchanging messages and viewing uploaded media. Placeholders for the upcoming
 show calendar and merch shop are also included.
+Swagger documentation is available at [http://localhost:3000/docs](http://localhost:3000/docs).
 Click an artist on the Artists page to view their profile at `/artists/:id`.
 
 ## Security
@@ -187,6 +188,7 @@ user who uploaded each file.
 
 - `GET /health` – simple health check returning `{ "status": "ok" }`
 - `GET /metrics` – basic metrics including total requests, errors and average response time
+- `GET /docs` – interactive Swagger documentation
 
 ## Validation and Error Handling
 

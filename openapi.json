@@ -1,0 +1,220 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Under the Radar API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "http://localhost:3000" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "username", "password"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "username": { "type": "string" },
+                  "password": { "type": "string" },
+                  "email": { "type": "string" },
+                  "bio": { "type": "string" },
+                  "social": { "type": "string" }
+                }
+              },
+              "example": {
+                "name": "Alice",
+                "username": "alice",
+                "password": "secret"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JWT token",
+            "content": {
+              "application/json": {
+                "example": { "token": "jwt", "id": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Log in and obtain a token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              },
+              "example": {
+                "username": "alice",
+                "password": "secret"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JWT token",
+            "content": {
+              "application/json": {
+                "example": { "token": "jwt", "id": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "summary": "List all users",
+        "responses": {
+          "200": {
+            "description": "User list",
+            "content": {
+              "application/json": {
+                "example": [
+                  {"id": 1, "name": "Alice"}
+                ]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Update current user profile",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"type": "object"}}}
+        },
+        "responses": {"200": {"description": "Update info"}}
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Fetch a user by id",
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"200": {"description": "User", "content": {"application/json": {"example": {"id": 1, "name": "Alice"}}}}}
+      }
+    },
+    "/messages/inbox": {
+      "get": {
+        "summary": "Get inbox messages",
+        "security": [{"BearerAuth": []}],
+        "responses": {"200": {"description": "Messages"}}
+      }
+    },
+    "/messages/outbox": {
+      "get": {
+        "summary": "Get outbox messages",
+        "security": [{"BearerAuth": []}],
+        "responses": {"200": {"description": "Messages"}}
+      }
+    },
+    "/messages": {
+      "post": {
+        "summary": "Send a message",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["receiver_id", "content"],
+                "properties": {
+                  "receiver_id": { "type": "integer" },
+                  "content": { "type": "string" }
+                }
+              },
+              "example": {"receiver_id": 2, "content": "Hi"}
+            }
+          }
+        },
+        "responses": {"200": {"description": "Message created"}}
+      }
+    },
+    "/media": {
+      "get": {
+        "summary": "List uploaded files",
+        "responses": {"200": {"description": "Files"}}
+      },
+      "post": {
+        "summary": "Upload a file",
+        "security": [{"BearerAuth": []}],
+        "requestBody": {"required": true, "content": {"multipart/form-data": {"schema": {"type": "object", "properties": {"file": {"type": "string", "format": "binary"}}}}}},
+        "responses": {"200": {"description": "File metadata"}}
+      }
+    },
+    "/media/{id}": {
+      "get": {
+        "summary": "Download or stream a file",
+        "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
+        "responses": {"200": {"description": "File"}}
+      }
+    },
+    "/shows": {
+      "get": {"summary": "List shows", "responses": {"200": {"description": "Shows"}}},
+      "post": {"summary": "Create a show", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["venue", "date"], "properties": {"venue": {"type": "string"}, "date": {"type": "string"}, "description": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
+    },
+    "/shows/user/{id}": {
+      "get": {"summary": "Shows for a user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Shows"}}}
+    },
+    "/merch": {
+      "get": {"summary": "List merch", "responses": {"200": {"description": "Items"}}},
+      "post": {"summary": "Create merch", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["product_name", "price"], "properties": {"product_name": {"type": "string"}, "price": {"type": "number"}, "stock": {"type": "integer"}}}}}}, "responses": {"200": {"description": "Created"}}}
+    },
+    "/merch/user/{id}": {
+      "get": {"summary": "Merch for user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Items"}}}
+    },
+    "/board": {
+      "get": {"summary": "List board posts", "responses": {"200": {"description": "Posts"}}},
+      "post": {"summary": "Create board post", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["content"], "properties": {"content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
+    },
+    "/board/user/{id}": {
+      "get": {"summary": "Posts by user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Posts"}}}
+    },
+    "/board/{id}/like": {
+      "post": {"summary": "Like a post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Success"}}}
+    },
+    "/board/{id}/dislike": {
+      "post": {"summary": "Dislike a post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Success"}}}
+    },
+    "/board/{id}/comments": {
+      "get": {"summary": "List comments", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Comments"}}},
+      "post": {"summary": "Add comment", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["content"], "properties": {"content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
+    },
+    "/health": {
+      "get": {"summary": "Health check", "responses": {"200": {"description": "OK", "content": {"application/json": {"example": {"status": "ok"}}}}}}
+    },
+    "/metrics": {
+      "get": {"summary": "Basic metrics", "responses": {"200": {"description": "Metrics"}}}
+    }
+  }
+}
