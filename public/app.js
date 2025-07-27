@@ -343,6 +343,8 @@ function ShowsSection({ userId }) {
 function Board({ auth }) {
   const [posts, setPosts] = React.useState([]);
   const [content, setContent] = React.useState('');
+  const [expanded, setExpanded] = React.useState(null);
+  const [comments, setComments] = React.useState({});
 
   const load = () => {
     fetch('/board')
@@ -351,6 +353,12 @@ function Board({ auth }) {
   };
 
   React.useEffect(load, []);
+
+  const loadComments = id => {
+    fetch(`/board/${id}/comments`)
+      .then(r => r.json())
+      .then(c => setComments(prev => ({ ...prev, [id]: c })));
+  };
 
   const submit = () => {
     if (!content || !auth.token) return alert('Sign in and enter content');
@@ -367,6 +375,28 @@ function Board({ auth }) {
         setContent('');
         load();
       });
+  };
+
+  const react = (id, type) => {
+    if (!auth.token) return alert('Sign in first');
+    fetch(`/board/${id}/${type}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${auth.token}` }
+    }).then(load);
+  };
+
+  const addComment = (id, text) => {
+    if (!auth.token || !text) return alert('Sign in and enter a comment');
+    fetch(`/board/${id}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.token}`
+      },
+      body: JSON.stringify({ content: text })
+    })
+      .then(r => r.json())
+      .then(() => loadComments(id));
   };
 
   return (
@@ -387,13 +417,64 @@ function Board({ auth }) {
       <div className="space-y-2">
         {posts.map(p => (
           <div key={p.id} className="border p-2 bg-white">
-            <div className="text-sm text-gray-600">
+            <div
+              className="text-sm text-gray-600 cursor-pointer"
+              onClick={() => {
+                setExpanded(expanded === p.id ? null : p.id);
+                if (expanded !== p.id) loadComments(p.id);
+              }}
+            >
               {p.username} - {new Date(p.created_at).toLocaleString()}
             </div>
             <div>{p.content}</div>
+            <div className="space-x-2 text-sm mt-1">
+              <button className="text-blue-600" onClick={() => react(p.id, 'like')}>
+                Like ({p.likes})
+              </button>
+              <button className="text-red-600" onClick={() => react(p.id, 'dislike')}>
+                Dislike ({p.dislikes})
+              </button>
+              <span>Comments: {p.comments}</span>
+            </div>
+            {expanded === p.id && (
+              <div className="mt-2 space-y-1">
+                {(comments[p.id] || []).map(c => (
+                  <div key={c.id} className="border-t pt-1 text-sm">
+                    <span className="font-bold mr-1">{c.username}:</span>
+                    {c.content}
+                  </div>
+                ))}
+                {auth.token && (
+                  <CommentForm onAdd={text => addComment(p.id, text)} />
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function CommentForm({ onAdd }) {
+  const [text, setText] = React.useState('');
+  return (
+    <div className="mt-1 flex">
+      <input
+        className="border p-1 flex-grow mr-2"
+        placeholder="Add comment"
+        value={text}
+        onChange={e => setText(e.target.value)}
+      />
+      <button
+        className="bg-green-600 text-white px-2"
+        onClick={() => {
+          onAdd(text);
+          setText('');
+        }}
+      >
+        Comment
+      </button>
     </div>
   );
 }

@@ -78,6 +78,8 @@ Current tables include:
 - `shows` – upcoming performances for an artist
 - `merch` – merchandise items for sale
 - `board_posts` – simple message board entries
+- `board_reactions` – user likes or dislikes on board posts
+- `board_comments` – comments attached to board posts
 
 ## API Endpoints
 
@@ -159,6 +161,10 @@ user who uploaded each file.
 - `GET /board` – list all board posts
 - `GET /board/user/:id` – posts by a specific user
 - `POST /board` – create a new board post (requires authentication)
+- `POST /board/:id/like` – like a post (requires authentication)
+- `POST /board/:id/dislike` – dislike a post (requires authentication)
+- `GET /board/:id/comments` – list comments on a post
+- `POST /board/:id/comments` – add a comment (requires authentication)
 
 ### Misc
 

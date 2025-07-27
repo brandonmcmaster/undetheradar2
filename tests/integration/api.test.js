@@ -102,6 +102,43 @@ test('board post creation', async () => {
   expect(items.find(p => p.content === 'Hello board')).toBeTruthy();
 });
 
+test('board post interactions', async () => {
+  const u1 = await context.post('/auth/register', {
+    data: { name: 'Ed', username: 'ed', password: 'pw' }
+  });
+  const { token: t1 } = await u1.json();
+  const u2 = await context.post('/auth/register', {
+    data: { name: 'Fay', username: 'fay', password: 'pw' }
+  });
+  const { token: t2 } = await u2.json();
+
+  const created = await context.post('/board', {
+    headers: { Authorization: `Bearer ${t1}` },
+    data: { content: 'Post' }
+  });
+  const { id } = await created.json();
+
+  const like = await context.post(`/board/${id}/like`, {
+    headers: { Authorization: `Bearer ${t2}` }
+  });
+  expect(like.ok()).toBeTruthy();
+
+  const comment = await context.post(`/board/${id}/comments`, {
+    headers: { Authorization: `Bearer ${t2}` },
+    data: { content: 'Nice' }
+  });
+  expect(comment.ok()).toBeTruthy();
+
+  const posts = await context.get('/board');
+  const arr = await posts.json();
+  const p = arr.find(x => x.id === id);
+  expect(p.likes).toBe(1);
+
+  const comms = await context.get(`/board/${id}/comments`);
+  const list = await comms.json();
+  expect(list.find(c => c.content === 'Nice')).toBeTruthy();
+});
+
 test('health check works', async () => {
   const res = await context.get('/health');
   expect(res.ok()).toBeTruthy();

@@ -10,7 +10,7 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 - Foreign key constraints are enabled via `PRAGMA foreign_keys = ON`.
 
 ## Database
-- New tables: `shows`, `merch` and `board_posts`.
+- New tables: `shows`, `merch`, `board_posts`, `board_reactions` and `board_comments`.
 
 ## Media uploads
 - Files are stored in the `uploads/` directory.
