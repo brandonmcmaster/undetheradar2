@@ -29,9 +29,9 @@ router.get('/user/:id', param('id').isInt(), validate, (req, res, next) => {
 router.post(
   '/',
   authenticate,
-  body('venue').trim().notEmpty(),
+  body('venue').trim().notEmpty().escape(),
   body('date').notEmpty(),
-  body('description').optional(),
+  body('description').optional().escape(),
   validate,
   (req, res, next) => {
     const { venue, date, description } = req.body;

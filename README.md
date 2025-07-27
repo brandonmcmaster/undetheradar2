@@ -51,7 +51,9 @@ Start the server:
 npm start
 ```
 
-The server listens on port `3000` by default.
+Environment variables are loaded from a `.env` file. Set `PORT`, `DB_FILE` and
+`JWT_SECRET` as needed. Optional values include `CORS_ORIGIN` and rate limit
+settings. The server listens on port `3000` if `PORT` is not specified.
 
 Once running, open [http://localhost:3000](http://localhost:3000) to view the
 React interface. All frontend libraries (React, React Router, Tailwind and
@@ -61,6 +63,13 @@ provides pages for signing in, browsing artists (with individual artist profiles
 exchanging messages and viewing uploaded media. Placeholders for the upcoming
 show calendar and merch shop are also included.
 Click an artist on the Artists page to view their profile at `/artists/:id`.
+
+## Security
+
+The server uses **helmet** to set common security headers and applies a
+rate‑limiting middleware to reduce abuse. CORS can be enabled for a specific
+origin via the `CORS_ORIGIN` environment variable. All incoming text fields are
+sanitized with `express-validator` to minimize injection and XSS risks.
 
 ## Logging and Monitoring
 
@@ -72,8 +81,9 @@ average response time.
 ## Database
 
 The API uses **SQLite** for data storage. When you start the server for the
-first time it will automatically create a file named `app.db` in the project
-root containing the required tables. Foreign key support is enabled with
+first time it will automatically create a database file specified by the
+`DB_FILE` environment variable (default `app.db`) containing the required
+tables. Foreign key support is enabled with
 `PRAGMA foreign_keys = ON` so related records are removed when a parent row is
 deleted.
 

@@ -8,6 +8,7 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 - Keep dependencies minimal.
 - Use **Pino** for structured logging; all requests should include a request ID.
 - Foreign key constraints are enabled via `PRAGMA foreign_keys = ON`.
+- Configuration values like `PORT`, `DB_FILE` and `JWT_SECRET` are loaded from a `.env` file using `dotenv`.
 
 ## Database
 - New tables: `shows`, `merch`, `board_posts`, `board_reactions` and `board_comments`.

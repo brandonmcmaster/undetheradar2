@@ -34,7 +34,7 @@ router.post(
   '/',
   authenticate,
   body('receiver_id').isInt(),
-  body('content').trim().notEmpty(),
+  body('content').trim().notEmpty().escape(),
   validate,
   (req, res, next) => {
     const { receiver_id, content } = req.body;
