@@ -2,51 +2,16 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Under the Radar UI</title>
+  <title>Under the Radar</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/react-router-dom@6/umd/react-router-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 </head>
-<body>
-  <h1>Under the Radar</h1>
-  <section>
-    <h2>Register</h2>
-    <input id="reg-name" placeholder="Name">
-    <input id="reg-username" placeholder="Username">
-    <input id="reg-password" placeholder="Password" type="password">
-    <button id="register">Register</button>
-  </section>
-  <section>
-    <h2>Login</h2>
-    <input id="login-username" placeholder="Username">
-    <input id="login-password" placeholder="Password" type="password">
-    <button id="login">Login</button>
-    <p id="token-display"></p>
-  </section>
-  <section>
-    <h2>Users</h2>
-    <button id="load-users">Load Users</button>
-    <pre id="users-output"></pre>
-  </section>
-  <section>
-    <h2>Send Message</h2>
-    <input id="receiver-id" placeholder="Receiver ID" type="number">
-    <input id="message-content" placeholder="Content">
-    <button id="send-message">Send</button>
-  </section>
-  <section>
-    <h2>Messages</h2>
-    <button id="load-messages">Load Messages</button>
-    <pre id="messages-output"></pre>
-  </section>
-  <section>
-    <h2>Upload Media</h2>
-    <input id="media-file" type="file">
-    <button id="upload-media">Upload</button>
-  </section>
-  <section>
-    <h2>Media Files</h2>
-    <button id="load-media">Load Media</button>
-    <pre id="media-output"></pre>
-  </section>
-  <script src="script.js"></script>
+<body class="bg-gray-50">
+  <div id="root"></div>
+  <script type="text/babel" src="app.js"></script>
 </body>
 </html>
