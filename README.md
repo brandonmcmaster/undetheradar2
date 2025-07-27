@@ -46,10 +46,12 @@ npm start
 The server listens on port `3000` by default.
 
 Once running, open [http://localhost:3000](http://localhost:3000) to view the
-new React interface. The UI is built with **Tailwind CSS** and embraces a retro
-internet vibe. It provides pages for signing in, browsing artists, managing
-your profile, exchanging messages and viewing uploaded media. Placeholders for
-the upcoming show calendar and merch shop are also included.
+React interface. All frontend libraries (React, React Router, Tailwind and
+Babel) are included in the repository under `public/vendor` so the site works
+without hitting external CDNs. The UI embraces a retro internet vibe and
+provides pages for signing in, browsing artists, managing your profile,
+exchanging messages and viewing uploaded media. Placeholders for the upcoming
+show calendar and merch shop are also included.
 
 ## Database
 
