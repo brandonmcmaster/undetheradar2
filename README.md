@@ -135,6 +135,18 @@ Uploaded files are stored in the `uploads` directory and scanned with
 accepted. The database records the original filename, MIME type, size and the
 user who uploaded each file.
 
+### `/shows`
+
+- `GET /shows` – list all shows
+- `GET /shows/user/:id` – shows for a specific artist
+- `POST /shows` – create a new show (requires authentication)
+
+### `/merch`
+
+- `GET /merch` – list all merch items
+- `GET /merch/user/:id` – merch for a specific user
+- `POST /merch` – create a merch item (requires authentication)
+
 ## Validation and Error Handling
 
 All incoming requests now go through `express-validator` checks. For example,

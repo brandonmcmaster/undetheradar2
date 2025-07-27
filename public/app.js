@@ -43,7 +43,13 @@ function Nav({ auth }) {
 }
 
 function Home() {
-  return <div className="p-4">Welcome to Under the Radar!</div>;
+  return (
+    <div className="p-4 space-y-2">
+      <div className="text-xl font-bold">Under the Radar</div>
+      <p>A home for underground musicians to share their art without algorithms.</p>
+      <p>Create a profile, upload your tracks and photos, list shows and sell merch directly to fans.</p>
+    </div>
+  );
 }
 
 function SignIn({ auth }) {
@@ -108,11 +114,25 @@ function Profile({ auth }) {
   if (!profile) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="p-4 space-y-2">
-      <div>Name: {profile.name}</div>
-      <div>Username: {profile.username}</div>
-      <div>Email: {profile.email || 'N/A'}</div>
-      <div>Bio: {profile.bio || 'N/A'}</div>
+    <div className="p-4 space-y-4">
+      <div className="space-y-1">
+        <div>Name: {profile.name}</div>
+        <div>Username: {profile.username}</div>
+        <div>Email: {profile.email || 'N/A'}</div>
+        <div>Bio: {profile.bio || 'N/A'}</div>
+      </div>
+      <div>
+        <div className="font-bold mb-1">Media</div>
+        <MediaGallery userId={auth.userId} />
+      </div>
+      <div>
+        <div className="font-bold mb-1">Merch</div>
+        <MerchSection userId={auth.userId} />
+      </div>
+      <div>
+        <div className="font-bold mb-1">Upcoming Shows</div>
+        <ShowsSection userId={auth.userId} />
+      </div>
     </div>
   );
 }
@@ -146,13 +166,25 @@ function ArtistDetail() {
   }, [id]);
   if (!user) return <div className="p-4">Loading...</div>;
   return (
-    <div className="p-4 space-y-2">
+    <div className="p-4 space-y-4">
       <Link className="text-blue-600 underline" to="/artists">Back to artists</Link>
       <div className="text-xl font-bold">{user.name}</div>
       <div className="text-sm mb-2">@{user.username}</div>
       <div>Email: {user.email || 'N/A'}</div>
       <div>Bio: {user.bio || 'N/A'}</div>
       <div>Social: {user.social || 'N/A'}</div>
+      <div>
+        <div className="font-bold mb-1">Media</div>
+        <MediaGallery userId={id} />
+      </div>
+      <div>
+        <div className="font-bold mb-1">Merch</div>
+        <MerchSection userId={id} />
+      </div>
+      <div>
+        <div className="font-bold mb-1">Upcoming Shows</div>
+        <ShowsSection userId={id} />
+      </div>
     </div>
   );
 }
@@ -237,6 +269,72 @@ function Media({ auth }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function MediaGallery({ userId }) {
+  const [files, setFiles] = React.useState([]);
+  React.useEffect(() => {
+    fetch('/media')
+      .then(r => r.json())
+      .then(data => setFiles(data.filter(f => f.user_id == userId)));
+  }, [userId]);
+  if (!files.length) return <div>No media yet.</div>;
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      {files.map(f => (
+        <div key={f.id} className="border p-2 bg-white">
+          {f.mime_type && f.mime_type.startsWith('image') && (
+            <img className="max-w-full" src={`/media/${f.id}`} alt={f.original_name} />
+          )}
+          {f.mime_type === 'audio/mpeg' && (
+            <audio controls src={`/media/${f.id}`} className="w-full" />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MerchSection({ userId }) {
+  const [items, setItems] = React.useState([]);
+  React.useEffect(() => {
+    fetch(`/merch/user/${userId}`)
+      .then(r => r.json())
+      .then(setItems);
+  }, [userId]);
+  if (!items.length) return <div>No merch yet.</div>;
+  return (
+    <div className="space-y-2">
+      {items.map(m => (
+        <div key={m.id} className="border p-2 bg-white">
+          <div className="font-bold">{m.product_name}</div>
+          <div>${Number(m.price).toFixed(2)}</div>
+          <div>In stock: {m.stock}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ShowsSection({ userId }) {
+  const [shows, setShows] = React.useState([]);
+  React.useEffect(() => {
+    fetch(`/shows/user/${userId}`)
+      .then(r => r.json())
+      .then(setShows);
+  }, [userId]);
+  if (!shows.length) return <div>No upcoming shows.</div>;
+  return (
+    <div className="space-y-2">
+      {shows.map(s => (
+        <div key={s.id} className="border p-2 bg-white">
+          <div className="font-bold">{s.venue}</div>
+          <div>{new Date(s.date).toLocaleDateString()}</div>
+          <div>{s.description}</div>
+        </div>
+      ))}
     </div>
   );
 }
