@@ -6,6 +6,8 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const { db } = require('../db');
 const authenticate = require('../middleware/auth');
+const { param } = require('express-validator');
+const validate = require('../middleware/validate');
 
 const uploadDir = path.join(__dirname, '..', 'uploads');
 const allowedTypes = ['image/jpeg', 'image/png', 'audio/mpeg', 'video/mp4'];
@@ -32,31 +34,37 @@ const upload = multer({
 });
 
 // List uploaded files
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
   db.all('SELECT * FROM media', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) return next(err);
     res.json(rows);
   });
 });
 
 // Upload a new file
-router.post('/', authenticate, upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'File is required' });
+router.post('/', authenticate, upload.single('file'), (req, res, next) => {
+  if (!req.file) {
+    const errFile = new Error('File is required');
+    errFile.status = 400;
+    return next(errFile);
+  }
 
   const filePath = path.join(uploadDir, req.file.filename);
   // Virus scan using clamscan if available
   exec(`clamscan ${filePath}`, (err, stdout) => {
-    if (err && err.code !== 1 && err.code !== 2) return res.status(500).json({ error: 'Virus scan failed' });
+    if (err && err.code !== 1 && err.code !== 2) return next(new Error('Virus scan failed'));
     if (stdout && stdout.includes('FOUND')) {
       fs.unlinkSync(filePath);
-      return res.status(400).json({ error: 'Infected file' });
+      const infected = new Error('Infected file');
+      infected.status = 400;
+      return next(infected);
     }
 
     db.run(
       `INSERT INTO media(file_name, original_name, mime_type, size, user_id) VALUES(?,?,?,?,?)`,
       [req.file.filename, req.file.originalname, req.file.mimetype, req.file.size, req.user.id],
       function(err2) {
-        if (err2) return res.status(500).json({ error: err2.message });
+        if (err2) return next(err2);
         res.json({ id: this.lastID, file: req.file.filename });
       }
     );
@@ -64,13 +72,25 @@ router.post('/', authenticate, upload.single('file'), (req, res) => {
 });
 
 // Stream or download a file by id
-router.get('/:id', (req, res) => {
-  db.get('SELECT file_name, mime_type FROM media WHERE id = ?', [req.params.id], (err, row) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!row) return res.status(404).json({ error: 'Not found' });
+router.get(
+  '/:id',
+  param('id').isInt(),
+  validate,
+  (req, res, next) => {
+    db.get('SELECT file_name, mime_type FROM media WHERE id = ?', [req.params.id], (err, row) => {
+      if (err) return next(err);
+      if (!row) {
+        const nf = new Error('Not found');
+        nf.status = 404;
+        return next(nf);
+      }
 
     const filePath = path.join(uploadDir, path.basename(row.file_name));
-    if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File missing' });
+    if (!fs.existsSync(filePath)) {
+      const errFile = new Error('File missing');
+      errFile.status = 404;
+      return next(errFile);
+    }
 
     const stat = fs.statSync(filePath);
     const range = req.headers.range;
@@ -96,7 +116,8 @@ router.get('/:id', (req, res) => {
       });
       fs.createReadStream(filePath).pipe(res);
     }
-  });
-});
+    });
+  }
+);
 
 module.exports = router;
