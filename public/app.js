@@ -1,7 +1,7 @@
 // React front-end for Under the Radar
 // Uses React and Tailwind from CDNs. Retro fonts via style.css.
 
-const { BrowserRouter, Routes, Route, Link, useNavigate } = ReactRouterDOM;
+const { BrowserRouter, Routes, Route, Link, useNavigate, useParams } = ReactRouterDOM;
 
 function useToken() {
   const [token, setToken] = React.useState(localStorage.getItem('token') || '');
@@ -127,11 +127,32 @@ function Artists() {
   return (
     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
       {users.map(u => (
-        <div key={u.id} className="border p-2 bg-white">
+        <Link key={u.id} to={`/artists/${u.id}`} className="border p-2 bg-white block hover:bg-gray-100">
           <div className="font-bold">{u.name}</div>
           <div className="text-sm">@{u.username}</div>
-        </div>
+        </Link>
       ))}
+    </div>
+  );
+}
+
+function ArtistDetail() {
+  const { id } = useParams();
+  const [user, setUser] = React.useState(null);
+  React.useEffect(() => {
+    fetch(`/users/${id}`)
+      .then(r => r.json())
+      .then(setUser);
+  }, [id]);
+  if (!user) return <div className="p-4">Loading...</div>;
+  return (
+    <div className="p-4 space-y-2">
+      <Link className="text-blue-600 underline" to="/artists">Back to artists</Link>
+      <div className="text-xl font-bold">{user.name}</div>
+      <div className="text-sm mb-2">@{user.username}</div>
+      <div>Email: {user.email || 'N/A'}</div>
+      <div>Bio: {user.bio || 'N/A'}</div>
+      <div>Social: {user.social || 'N/A'}</div>
     </div>
   );
 }
@@ -235,6 +256,7 @@ function App() {
           <Route path="/signin" element={<SignIn auth={auth} />} />
           <Route path="/profile" element={<Profile auth={auth} />} />
           <Route path="/artists" element={<Artists />} />
+          <Route path="/artists/:id" element={<ArtistDetail />} />
           <Route path="/messages" element={<Messages auth={auth} />} />
           <Route path="/media" element={<Media auth={auth} />} />
           <Route path="/shows" element={<Placeholder text="Show calendar" />} />
