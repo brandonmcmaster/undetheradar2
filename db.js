@@ -30,7 +30,12 @@ const init = () => {
     db.run(`CREATE TABLE IF NOT EXISTS media (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       file_name TEXT NOT NULL,
-      uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      original_name TEXT,
+      mime_type TEXT,
+      size INTEGER,
+      user_id INTEGER,
+      uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL ON UPDATE CASCADE
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS shows (
@@ -58,6 +63,19 @@ const init = () => {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
     )`);
+
+    // Ensure media table has all columns when upgrading from older versions
+    db.all('PRAGMA table_info(media)', [], (err, cols) => {
+      if (err) return;
+      const names = cols.map(c => c.name);
+      const add = (name, type) => {
+        if (!names.includes(name)) db.run(`ALTER TABLE media ADD COLUMN ${name} ${type}`);
+      };
+      add('original_name', 'TEXT');
+      add('mime_type', 'TEXT');
+      add('size', 'INTEGER');
+      add('user_id', 'INTEGER');
+    });
   });
 };
 

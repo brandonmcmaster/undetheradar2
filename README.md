@@ -20,7 +20,9 @@ minimal dependencies. Current endpoints include:
 - `POST /users` – update the authenticated user's profile
 - `GET /users/:id` – fetch a user by id
 - `GET /messages` and `POST /messages` – list and send messages (sending requires authentication)
-- `GET /media` and `POST /media` – list and upload media files (upload requires authentication)
+- `GET /media` – list uploaded files
+- `POST /media` – upload a file (requires authentication)
+- `GET /media/:id` – stream or download a specific file
 
 Future additions will cover show listings, merch management and the message
 board. Everything is intentionally straightforward with no ranking algorithms.
@@ -107,8 +109,9 @@ curl -X POST http://localhost:3000/messages \
 
 ### `/media`
 
-- `GET /media` – list uploaded files
+- `GET /media` – list uploaded files with metadata
 - `POST /media` – upload a file using `multipart/form-data` (requires authentication)
+- `GET /media/:id` – stream or download the file by id
 
 Example request to upload a file:
 
@@ -117,3 +120,8 @@ curl -X POST http://localhost:3000/media \
   -H "Authorization: Bearer <TOKEN>" \
   -F file=@path/to/image.png
 ```
+
+Uploaded files are stored in the `uploads` directory and scanned with
+`clamscan` when available. Only JPEG, PNG, MP3 and MP4 files up to 10 MB are
+accepted. The database records the original filename, MIME type, size and the
+user who uploaded each file.

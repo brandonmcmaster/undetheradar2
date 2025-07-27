@@ -11,6 +11,11 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 ## Database
 - New tables: `shows`, `merch` and `board_posts`.
 
+## Media uploads
+- Files are stored in the `uploads/` directory.
+- Only JPEG, PNG, MP3 and MP4 files up to 10 MB are accepted.
+- Uploaded files should be scanned with `clamscan` when available.
+
 ## Contributions
 - Document any new endpoints or significant features in `README.md`.
 - Update this `AGENTS.md` with any new development guidelines.
