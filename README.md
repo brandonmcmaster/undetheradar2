@@ -27,6 +27,7 @@ minimal dependencies. Structured logs are produced with **Pino**. Current endpoi
 - `GET /users` – list user profiles
 - `POST /users` – update the authenticated user's profile
 - `GET /users/:id` – fetch a user by id
+- `POST /users/avatar` – upload a profile picture (requires authentication)
 - `GET /messages/inbox` – read your incoming messages (requires authentication)
 - `GET /messages/outbox` – read your sent messages (requires authentication)
 - `POST /messages` – send a new message (requires authentication)
@@ -127,6 +128,7 @@ curl -X POST http://localhost:3000/auth/login \
 - `GET /users` – list all users
 - `POST /users` – update the authenticated user's profile
 - `GET /users/:id` – fetch a user by id
+- `POST /users/avatar` – upload or update your profile picture
 
 ### `/messages`
 

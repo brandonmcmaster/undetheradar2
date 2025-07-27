@@ -194,6 +194,28 @@ test('merch endpoints work', async () => {
   expect(userList.find(m => m.id === merchId)).toBeTruthy();
 });
 
+test('avatar upload works', async () => {
+  const reg = await context.post('/auth/register', {
+    data: { name: 'Ian', username: 'ian', password: 'pw' }
+  });
+  const { token, id } = await reg.json();
+  const fs = require('fs');
+  const path = require('path');
+  const tmp = path.join(__dirname, 'avatar.png');
+  fs.writeFileSync(tmp, Buffer.from([0xff, 0xd8, 0xff]));
+  const up = await context.post('/users/avatar', {
+    headers: { Authorization: `Bearer ${token}` },
+    multipart: { avatar: fs.createReadStream(tmp) }
+  });
+  fs.unlinkSync(tmp);
+  expect(up.ok()).toBeTruthy();
+  const data = await up.json();
+  expect(data.avatar_id).toBeGreaterThan(0);
+  const user = await context.get(`/users/${id}`);
+  const ujson = await user.json();
+  expect(ujson.avatar_id).toBe(data.avatar_id);
+});
+
 test('metrics endpoint responds', async () => {
   const res = await context.get('/metrics');
   expect(res.ok()).toBeTruthy();
