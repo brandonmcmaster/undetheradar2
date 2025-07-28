@@ -569,6 +569,8 @@ function Board({ auth }) {
   const [comments, setComments] = React.useState({});
   const [editing, setEditing] = React.useState(null);
   const [editText, setEditText] = React.useState('');
+  const [postEditing, setPostEditing] = React.useState(null);
+  const [postEditText, setPostEditText] = React.useState('');
 
   const load = () => {
     fetch('/board')
@@ -638,6 +640,21 @@ function Board({ auth }) {
     });
   };
 
+  const updatePost = (id, text) => {
+    fetch(`/board/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.token}`
+      },
+      body: JSON.stringify({ content: text })
+    }).then(() => {
+      setPostEditing(null);
+      setPostEditText('');
+      load();
+    });
+  };
+
   const removeComment = (cid, pid) => {
     fetch(`/board/comments/${cid}`, {
       method: 'DELETE',
@@ -677,9 +694,25 @@ function Board({ auth }) {
                 if (expanded !== p.id) loadComments(p.id);
               }}
             >
-              {p.username} - {new Date(p.created_at).toLocaleString()}
+              {p.username} - {new Date(p.created_at).toLocaleString()} {p.updated_at ? '(edited)' : ''}
             </div>
-            <div>{p.content}</div>
+            {postEditing === p.id ? (
+              <div className="space-x-1 mt-1">
+                <input
+                  className="border p-0.5"
+                  value={postEditText}
+                  onChange={e => setPostEditText(e.target.value)}
+                />
+                <button className="text-green-600" onClick={() => updatePost(p.id, postEditText)}>
+                  Save
+                </button>
+                <button className="text-gray-600" onClick={() => setPostEditing(null)}>
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div>{p.content}</div>
+            )}
             <div className="space-x-2 text-sm mt-1">
               <button className="text-blue-600" onClick={() => react(p.id, 'like')}>
                 Like ({p.likes})
@@ -689,9 +722,20 @@ function Board({ auth }) {
               </button>
               <span>Comments: {p.comments}</span>
               {auth.userId == p.user_id && (
-                <button className="text-sm text-red-700" onClick={() => removePost(p.id)}>
-                  Delete
-                </button>
+                <span className="space-x-1">
+                  <button
+                    className="text-sm text-blue-700"
+                    onClick={() => {
+                      setPostEditing(p.id);
+                      setPostEditText(p.content);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button className="text-sm text-red-700" onClick={() => removePost(p.id)}>
+                    Delete
+                  </button>
+                </span>
               )}
             </div>
             {expanded === p.id && (
