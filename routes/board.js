@@ -128,7 +128,7 @@ router.put(
         no.status = 403;
         return next(no);
       }
-      db.run('UPDATE board_posts SET content = ? WHERE id = ?', [content, req.params.id], err2 => {
+      db.run('UPDATE board_posts SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [content, req.params.id], err2 => {
         if (err2) return next(err2);
         res.json({ success: true });
       });

@@ -63,6 +63,7 @@ const init = () => {
       user_id INTEGER NOT NULL,
       content TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
     )`);
 
@@ -117,6 +118,15 @@ const init = () => {
       }
       if (!names.includes('is_artist')) {
         db.run('ALTER TABLE users ADD COLUMN is_artist INTEGER DEFAULT 0');
+      }
+    });
+
+    // Ensure board_posts has updated_at column
+    db.all('PRAGMA table_info(board_posts)', [], (err, cols) => {
+      if (err) return;
+      const names = cols.map(c => c.name);
+      if (!names.includes('updated_at')) {
+        db.run('ALTER TABLE board_posts ADD COLUMN updated_at DATETIME');
       }
     });
   });

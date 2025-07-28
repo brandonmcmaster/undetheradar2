@@ -156,7 +156,9 @@ test('board post editing', async () => {
   expect(edit.ok()).toBeTruthy();
   const posts = await context.get('/board');
   const arr = await posts.json();
-  expect(arr.find(p => p.id === id).content).toBe('Edited');
+  const updated = arr.find(p => p.id === id);
+  expect(updated.content).toBe('Edited');
+  expect(updated.updated_at).toBeTruthy();
 });
 
 test('comment editing and post deletion', async () => {

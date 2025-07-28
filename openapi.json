@@ -251,7 +251,7 @@
       "get": {"summary": "Merch for user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Items"}}}
     },
     "/board": {
-      "get": {"summary": "List board posts", "responses": {"200": {"description": "Posts"}}},
+      "get": {"summary": "List board posts", "description": "Posts include `updated_at` when edited", "responses": {"200": {"description": "Posts"}}},
       "post": {"summary": "Create board post", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["content"], "properties": {"content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
     },
     "/board/user/{id}": {
