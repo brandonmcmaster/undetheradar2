@@ -23,15 +23,20 @@ function useToken() {
 
 function Nav({ auth, unread }) {
   const [avatar, setAvatar] = React.useState(null);
+  const [username, setUsername] = React.useState('');
 
   React.useEffect(() => {
     if (!auth.token || !auth.userId) {
       setAvatar(null);
+      setUsername('');
       return;
     }
     fetch(`/users/${auth.userId}`)
       .then(r => r.json())
-      .then(u => setAvatar(u.avatar_id || null));
+      .then(u => {
+        setAvatar(u.avatar_id || null);
+        setUsername(u.username);
+      });
   }, [auth.token, auth.userId]);
 
   return (
@@ -45,6 +50,7 @@ function Nav({ auth, unread }) {
               <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs">N/A</div>
             )}
           </Link>
+          <span className="text-sm">@{username}</span>
           <button onClick={auth.clear}>Logout</button>
         </div>
       ) : (
