@@ -565,12 +565,14 @@ function ShowsSection({ userId }) {
 function Board({ auth }) {
   const [posts, setPosts] = React.useState([]);
   const [content, setContent] = React.useState('');
+  const [headline, setHeadline] = React.useState('');
   const [expanded, setExpanded] = React.useState(null);
   const [comments, setComments] = React.useState({});
   const [editing, setEditing] = React.useState(null);
   const [editText, setEditText] = React.useState('');
   const [postEditing, setPostEditing] = React.useState(null);
   const [postEditText, setPostEditText] = React.useState('');
+  const [postEditHeadline, setPostEditHeadline] = React.useState('');
 
   const load = () => {
     fetch('/board')
@@ -587,18 +589,19 @@ function Board({ auth }) {
   };
 
   const submit = () => {
-    if (!content || !auth.token) return alert('Sign in and enter content');
+    if (!headline || !content || !auth.token) return alert('Sign in and enter content');
     fetch('/board', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${auth.token}`
       },
-      body: JSON.stringify({ content })
+      body: JSON.stringify({ headline, content })
     })
       .then(r => r.json())
       .then(() => {
         setContent('');
+        setHeadline('');
         load();
       });
   };
@@ -640,17 +643,18 @@ function Board({ auth }) {
     });
   };
 
-  const updatePost = (id, text) => {
+  const updatePost = (id, head, text) => {
     fetch(`/board/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${auth.token}`
       },
-      body: JSON.stringify({ content: text })
+      body: JSON.stringify({ headline: head, content: text })
     }).then(() => {
       setPostEditing(null);
       setPostEditText('');
+      setPostEditHeadline('');
       load();
     });
   };
@@ -675,6 +679,12 @@ function Board({ auth }) {
         <div>
           <input
             className="border p-1 mr-2"
+            placeholder="Headline"
+            value={headline}
+            onChange={e => setHeadline(e.target.value)}
+          />
+          <input
+            className="border p-1 mr-2"
             placeholder="New post"
             value={content}
             onChange={e => setContent(e.target.value)}
@@ -688,22 +698,31 @@ function Board({ auth }) {
         {posts.map(p => (
           <div key={p.id} className="border p-2 bg-white">
             <div
-              className="text-sm text-gray-600 cursor-pointer"
+              className="font-semibold text-lg cursor-pointer"
               onClick={() => {
                 setExpanded(expanded === p.id ? null : p.id);
                 if (expanded !== p.id) loadComments(p.id);
               }}
             >
+              {p.headline}
+            </div>
+            <div className="text-sm text-gray-600">
               {p.username} - {new Date(p.created_at).toLocaleString()} {p.updated_at ? '(edited)' : ''}
             </div>
             {postEditing === p.id ? (
               <div className="space-x-1 mt-1">
                 <input
+                  className="border p-0.5 mr-1"
+                  placeholder="Headline"
+                  value={postEditHeadline}
+                  onChange={e => setPostEditHeadline(e.target.value)}
+                />
+                <input
                   className="border p-0.5"
                   value={postEditText}
                   onChange={e => setPostEditText(e.target.value)}
                 />
-                <button className="text-green-600" onClick={() => updatePost(p.id, postEditText)}>
+                <button className="text-green-600" onClick={() => updatePost(p.id, postEditHeadline, postEditText)}>
                   Save
                 </button>
                 <button className="text-gray-600" onClick={() => setPostEditing(null)}>
@@ -725,11 +744,12 @@ function Board({ auth }) {
                 <span className="space-x-1">
                   <button
                     className="text-sm text-blue-700"
-                    onClick={() => {
-                      setPostEditing(p.id);
-                      setPostEditText(p.content);
-                    }}
-                  >
+                  onClick={() => {
+                    setPostEditing(p.id);
+                    setPostEditText(p.content);
+                    setPostEditHeadline(p.headline);
+                  }}
+                >
                     Edit
                   </button>
                   <button className="text-sm text-red-700" onClick={() => removePost(p.id)}>

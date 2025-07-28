@@ -42,16 +42,17 @@ router.get('/user/:id', param('id').isInt(), validate, (req, res, next) => {
 router.post(
   '/',
   authenticate,
+  body('headline').trim().notEmpty().escape(),
   body('content').trim().notEmpty().escape(),
   validate,
   (req, res, next) => {
-    const { content } = req.body;
+    const { headline, content } = req.body;
     db.run(
-      'INSERT INTO board_posts(user_id, content) VALUES(?, ?)',
-      [req.user.id, content],
+      'INSERT INTO board_posts(user_id, headline, content) VALUES(?, ?, ?)',
+      [req.user.id, headline, content],
       function (err) {
         if (err) return next(err);
-        res.json({ id: this.lastID, user_id: req.user.id, content });
+        res.json({ id: this.lastID, user_id: req.user.id, headline, content });
       }
     );
   }
@@ -112,10 +113,11 @@ router.put(
   '/:id',
   authenticate,
   param('id').isInt(),
+  body('headline').trim().notEmpty().escape(),
   body('content').trim().notEmpty().escape(),
   validate,
   (req, res, next) => {
-    const { content } = req.body;
+    const { headline, content } = req.body;
     db.get('SELECT user_id FROM board_posts WHERE id = ?', [req.params.id], (err, row) => {
       if (err) return next(err);
       if (!row) {
@@ -128,7 +130,7 @@ router.put(
         no.status = 403;
         return next(no);
       }
-      db.run('UPDATE board_posts SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [content, req.params.id], err2 => {
+      db.run('UPDATE board_posts SET headline = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [headline, content, req.params.id], err2 => {
         if (err2) return next(err2);
         res.json({ success: true });
       });

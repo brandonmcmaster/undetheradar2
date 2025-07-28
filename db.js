@@ -61,6 +61,7 @@ const init = () => {
     db.run(`CREATE TABLE IF NOT EXISTS board_posts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
+      headline TEXT NOT NULL,
       content TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME,
@@ -121,12 +122,15 @@ const init = () => {
       }
     });
 
-    // Ensure board_posts has updated_at column
+    // Ensure board_posts has updated_at and headline columns
     db.all('PRAGMA table_info(board_posts)', [], (err, cols) => {
       if (err) return;
       const names = cols.map(c => c.name);
       if (!names.includes('updated_at')) {
         db.run('ALTER TABLE board_posts ADD COLUMN updated_at DATETIME');
+      }
+      if (!names.includes('headline')) {
+        db.run("ALTER TABLE board_posts ADD COLUMN headline TEXT DEFAULT ''");
       }
     });
   });
