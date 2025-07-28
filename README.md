@@ -18,6 +18,7 @@ to:
 - Sell merchandise directly
 - Participate in a message board without algorithmic feeds
 - Post updates to a shared bulletin board
+- Follow other users and receive notifications for new activity
 
 The backend is built with Node.js, Express and SQLite using CommonJS modules and
 minimal dependencies. Structured logs are produced with **Pino**. Current endpoints include:
@@ -197,6 +198,17 @@ user who uploaded each file.
 - `PUT /board/comments/:id` – edit a comment (requires authentication)
 - `DELETE /board/comments/:id` – delete a comment (requires authentication)
 - `DELETE /board/:id` – delete a board post (requires authentication)
+
+### `/follow`
+
+- `POST /follow/:id` – follow a user (requires authentication)
+- `DELETE /follow/:id` – unfollow a user (requires authentication)
+- `GET /follow/:id` – check if the authenticated user follows `:id`
+
+### `/notifications`
+
+- `GET /notifications` – list notifications for the authenticated user
+- `POST /notifications/:id/read` – mark a notification as read
 
 ### Misc
 

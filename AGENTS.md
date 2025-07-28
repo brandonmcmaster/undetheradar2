@@ -11,7 +11,7 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 - Configuration values like `PORT`, `DB_FILE` and `JWT_SECRET` are loaded from a `.env` file using `dotenv`.
 
 ## Database
-- New tables: `shows`, `merch`, `board_posts`, `board_reactions`, `board_comments` and `profile_media`.
+- New tables: `shows`, `merch`, `board_posts`, `board_reactions`, `board_comments`, `profile_media`, `follows` and `notifications`.
 - The `board_posts` table includes an optional `updated_at` column set when a post is edited.
 - The `users` table now includes an `is_artist` flag to distinguish artist and regular profiles.
 

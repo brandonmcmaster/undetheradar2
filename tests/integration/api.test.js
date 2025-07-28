@@ -354,3 +354,35 @@ test('user search works', async () => {
   expect(letterList.length).toBe(1);
   expect(letterList[0].username).toBe('charlie');
 });
+
+test('follow and notifications work', async () => {
+  const u1 = await context.post('/auth/register', {
+    data: { name: 'A', username: 'aa', password: 'pw' }
+  });
+  const { token: t1, id: id1 } = await u1.json();
+  const u2 = await context.post('/auth/register', {
+    data: { name: 'B', username: 'bb', password: 'pw' }
+  });
+  const { token: t2, id: id2 } = await u2.json();
+
+  const follow = await context.post(`/follow/${id2}`, {
+    headers: { Authorization: `Bearer ${t1}` }
+  });
+  expect(follow.ok()).toBeTruthy();
+
+  const status = await context.get(`/follow/${id2}`, {
+    headers: { Authorization: `Bearer ${t1}` }
+  });
+  const st = await status.json();
+  expect(st.following).toBe(true);
+
+  const notes = await context.get('/notifications', {
+    headers: { Authorization: `Bearer ${t2}` }
+  });
+  const arr = await notes.json();
+  expect(arr.length).toBeGreaterThan(0);
+  const mark = await context.post(`/notifications/${arr[0].id}/read`, {
+    headers: { Authorization: `Bearer ${t2}` }
+  });
+  expect(mark.ok()).toBeTruthy();
+});

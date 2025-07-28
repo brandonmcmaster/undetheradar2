@@ -4,6 +4,7 @@ const { db } = require('../db');
 const authenticate = require('../middleware/auth');
 const { body, param } = require('express-validator');
 const validate = require('../middleware/validate');
+const notify = require('../utils/notify');
 
 // List all board posts
 router.get('/', (req, res, next) => {
@@ -65,6 +66,11 @@ router.post('/:id/like', authenticate, param('id').isInt(), validate, (req, res,
     ON CONFLICT(post_id, user_id) DO UPDATE SET reaction = 1`;
   db.run(sql, [req.params.id, req.user.id], err => {
     if (err) return next(err);
+    db.get('SELECT user_id FROM board_posts WHERE id = ?', [req.params.id], (e, row) => {
+      if (!e && row && row.user_id !== req.user.id) {
+        notify(row.user_id, `User ${req.user.id} liked your post`);
+      }
+    });
     res.json({ success: true });
   });
 });
@@ -76,6 +82,11 @@ router.post('/:id/dislike', authenticate, param('id').isInt(), validate, (req, r
     ON CONFLICT(post_id, user_id) DO UPDATE SET reaction = -1`;
   db.run(sql, [req.params.id, req.user.id], err => {
     if (err) return next(err);
+    db.get('SELECT user_id FROM board_posts WHERE id = ?', [req.params.id], (e, row) => {
+      if (!e && row && row.user_id !== req.user.id) {
+        notify(row.user_id, `User ${req.user.id} disliked your post`);
+      }
+    });
     res.json({ success: true });
   });
 });
@@ -103,6 +114,11 @@ router.post(
     const sql = `INSERT INTO board_comments(post_id, user_id, content) VALUES(?, ?, ?)`;
     db.run(sql, [req.params.id, req.user.id, content], function (err) {
       if (err) return next(err);
+      db.get('SELECT user_id FROM board_posts WHERE id = ?', [req.params.id], (e, row) => {
+        if (!e && row && row.user_id !== req.user.id) {
+          notify(row.user_id, `User ${req.user.id} commented on your post`);
+        }
+      });
       res.json({ id: this.lastID, post_id: req.params.id, user_id: req.user.id, content });
     });
   }

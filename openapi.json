@@ -275,6 +275,23 @@
       "put": {"summary": "Edit post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["headline", "content"], "properties": {"headline": {"type": "string"}, "content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Updated"}}},
       "delete": {"summary": "Delete post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Deleted"}}}
     },
+    "/follow/followers/{id}": {
+      "get": {"summary": "List followers", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Followers"}}}
+    },
+    "/follow/following/{id}": {
+      "get": {"summary": "List following", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Following"}}}
+    },
+    "/follow/{id}": {
+      "get": {"summary": "Check follow", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Status"}}},
+      "post": {"summary": "Follow user", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Followed"}}},
+      "delete": {"summary": "Unfollow user", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Unfollowed"}}}
+    },
+    "/notifications": {
+      "get": {"summary": "List notifications", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Notifications"}}}
+    },
+    "/notifications/{id}/read": {
+      "post": {"summary": "Mark notification read", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Updated"}}}
+    },
     "/health": {
       "get": {"summary": "Health check", "responses": {"200": {"description": "OK", "content": {"application/json": {"example": {"status": "ok"}}}}}}
     },
