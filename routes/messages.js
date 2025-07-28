@@ -4,6 +4,7 @@ const { db } = require('../db');
 const authenticate = require('../middleware/auth');
 const { body } = require('express-validator');
 const validate = require('../middleware/validate');
+const notify = require('../utils/notify');
 
 // Get authenticated user's inbox
 router.get('/inbox', authenticate, (req, res, next) => {
@@ -51,6 +52,9 @@ router.post(
         [req.user.id, receiver_id, content],
         function (err2) {
           if (err2) return next(err2);
+          if (receiver_id !== req.user.id) {
+            notify(receiver_id, `User ${req.user.id} sent you a message`);
+          }
           res.json({
             id: this.lastID,
             sender_id: req.user.id,

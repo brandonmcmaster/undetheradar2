@@ -28,6 +28,7 @@ function Nav({ auth }) {
       <Link className="hover:underline" to="/browse">Browse</Link>
       <Link className="hover:underline" to="/media">Media</Link>
       <Link className="hover:underline" to="/messages">Messages</Link>
+      <Link className="hover:underline" to="/notifications">Notifications</Link>
       <Link className="hover:underline" to="/board">Board</Link>
       <Link className="hover:underline" to="/shows">Shows</Link>
       <Link className="hover:underline" to="/merch">Merch</Link>
@@ -331,11 +332,24 @@ function UsersPage() {
 function UserDetail() {
   const { id } = useParams();
   const [user, setUser] = React.useState(null);
+  const token = localStorage.getItem('token') || '';
+  const [following, setFollowing] = React.useState(false);
   React.useEffect(() => {
     fetch(`/users/${id}`)
       .then(r => r.json())
       .then(setUser);
+    if (token) {
+      fetch(`/follow/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(d => setFollowing(!!d.following));
+    }
   }, [id]);
+  const toggle = () => {
+    if (!token) return alert('Sign in first');
+    const method = following ? 'DELETE' : 'POST';
+    fetch(`/follow/${id}`, { method, headers: { Authorization: `Bearer ${token}` } })
+      .then(() => setFollowing(!following));
+  };
   if (!user) return <div className="p-4">Loading...</div>;
   return (
     <div className="p-4 space-y-4">
@@ -349,6 +363,11 @@ function UserDetail() {
         <div>
           <div className="text-xl font-bold">{user.name}</div>
           <div className="text-sm mb-2">@{user.username}</div>
+          {token && localStorage.getItem('userId') != id && (
+            <button className="text-blue-600" onClick={toggle}>
+              {following ? 'Unfollow' : 'Follow'}
+            </button>
+          )}
         </div>
       </div>
       <div>Email: {user.email || 'N/A'}</div>
@@ -373,11 +392,24 @@ function UserDetail() {
 function ArtistDetail() {
   const { id } = useParams();
   const [user, setUser] = React.useState(null);
+  const token = localStorage.getItem('token') || '';
+  const [following, setFollowing] = React.useState(false);
   React.useEffect(() => {
     fetch(`/users/${id}`)
       .then(r => r.json())
       .then(setUser);
+    if (token) {
+      fetch(`/follow/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(d => setFollowing(!!d.following));
+    }
   }, [id]);
+  const toggle = () => {
+    if (!token) return alert('Sign in first');
+    const method = following ? 'DELETE' : 'POST';
+    fetch(`/follow/${id}`, { method, headers: { Authorization: `Bearer ${token}` } })
+      .then(() => setFollowing(!following));
+  };
   if (!user) return <div className="p-4">Loading...</div>;
   return (
     <div className="p-4 space-y-4">
@@ -391,6 +423,11 @@ function ArtistDetail() {
         <div>
           <div className="text-xl font-bold">{user.name}</div>
           <div className="text-sm mb-2">@{user.username}</div>
+          {token && localStorage.getItem('userId') != id && (
+            <button className="text-blue-600" onClick={toggle}>
+              {following ? 'Unfollow' : 'Follow'}
+            </button>
+          )}
         </div>
       </div>
       <div>Email: {user.email || 'N/A'}</div>
@@ -453,6 +490,34 @@ function Messages({ auth }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function Notifications({ auth }) {
+  const [items, setItems] = React.useState([]);
+  const load = () => {
+    if (!auth.token) return;
+    fetch('/notifications', { headers: { Authorization: `Bearer ${auth.token}` } })
+      .then(r => r.json())
+      .then(setItems);
+  };
+  const mark = id => {
+    fetch(`/notifications/${id}/read`, { method: 'POST', headers: { Authorization: `Bearer ${auth.token}` } }).then(load);
+  };
+  React.useEffect(load, [auth.token]);
+  if (!auth.token) return <div className="p-4">Please sign in.</div>;
+  return (
+    <div className="p-4 space-y-2">
+      {items.length === 0 && <div>No notifications.</div>}
+      {items.map(n => (
+        <div key={n.id} className="border p-2 bg-white flex justify-between">
+          <span>{n.message}</span>
+          {!n.is_read && (
+            <button className="text-blue-600" onClick={() => mark(n.id)}>Mark read</button>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -853,6 +918,7 @@ function App() {
           <Route path="/users" element={<UsersPage />} />
           <Route path="/users/:id" element={<UserDetail />} />
           <Route path="/messages" element={<Messages auth={auth} />} />
+          <Route path="/notifications" element={<Notifications auth={auth} />} />
           <Route path="/media" element={<Media auth={auth} />} />
           <Route path="/board" element={<Board auth={auth} />} />
           <Route path="/shows" element={<Placeholder text="Show calendar" />} />
