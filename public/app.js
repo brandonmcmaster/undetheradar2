@@ -36,16 +36,8 @@ function Nav({ auth }) {
 
   return (
     <nav className="bg-blue-800 text-white p-2 flex items-center space-x-4">
-      <Link className="hover:underline" to="/">Home</Link>
-      <Link className="hover:underline" to="/browse">Browse</Link>
-      <Link className="hover:underline" to="/media">Media</Link>
-      <Link className="hover:underline" to="/messages">Messages</Link>
-      <Link className="hover:underline" to="/notifications">Notifications</Link>
-      <Link className="hover:underline" to="/board">Board</Link>
-      <Link className="hover:underline" to="/shows">Shows</Link>
-      <Link className="hover:underline" to="/merch">Merch</Link>
       {auth.token ? (
-        <div className="ml-auto flex items-center space-x-2">
+        <div className="flex items-center space-x-2">
           <Link to="/profile">
             {avatar ? (
               <img className="w-8 h-8 rounded-full" src={`/media/${avatar}`} alt="avatar" />
@@ -56,8 +48,16 @@ function Nav({ auth }) {
           <button onClick={auth.clear}>Logout</button>
         </div>
       ) : (
-        <Link className="ml-auto hover:underline" to="/signin">Sign In</Link>
+        <Link className="hover:underline" to="/signin">Sign In</Link>
       )}
+      <Link className="hover:underline" to="/">Home</Link>
+      <Link className="hover:underline" to="/browse">Browse</Link>
+      <Link className="hover:underline" to="/media">Media</Link>
+      <Link className="hover:underline" to="/messages">Messages</Link>
+      <Link className="hover:underline" to="/notifications">Notifications</Link>
+      <Link className="hover:underline" to="/board">Board</Link>
+      <Link className="hover:underline" to="/shows">Shows</Link>
+      <Link className="hover:underline" to="/merch">Merch</Link>
     </nav>
   );
 }
