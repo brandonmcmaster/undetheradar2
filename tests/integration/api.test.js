@@ -93,13 +93,13 @@ test('board post creation', async () => {
   const { token } = await reg.json();
   const post = await context.post('/board', {
     headers: { Authorization: `Bearer ${token}` },
-    data: { content: 'Hello board' }
+    data: { headline: 'Test', content: 'Hello board' }
   });
   expect(post.ok()).toBeTruthy();
   const all = await context.get('/board');
   expect(all.ok()).toBeTruthy();
   const items = await all.json();
-  expect(items.find(p => p.content === 'Hello board')).toBeTruthy();
+  expect(items.find(p => p.headline === 'Test' && p.content === 'Hello board')).toBeTruthy();
 });
 
 test('board post interactions', async () => {
@@ -114,7 +114,7 @@ test('board post interactions', async () => {
 
   const created = await context.post('/board', {
     headers: { Authorization: `Bearer ${t1}` },
-    data: { content: 'Post' }
+    data: { headline: 'Hello', content: 'Post' }
   });
   const { id } = await created.json();
 
@@ -146,17 +146,18 @@ test('board post editing', async () => {
   const { token } = await reg.json();
   const created = await context.post('/board', {
     headers: { Authorization: `Bearer ${token}` },
-    data: { content: 'Original' }
+    data: { headline: 'Orig', content: 'Original' }
   });
   const { id } = await created.json();
   const edit = await context.put(`/board/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
-    data: { content: 'Edited' }
+    data: { headline: 'Changed', content: 'Edited' }
   });
   expect(edit.ok()).toBeTruthy();
   const posts = await context.get('/board');
   const arr = await posts.json();
   const updated = arr.find(p => p.id === id);
+  expect(updated.headline).toBe('Changed');
   expect(updated.content).toBe('Edited');
   expect(updated.updated_at).toBeTruthy();
 });
@@ -173,7 +174,7 @@ test('comment editing and post deletion', async () => {
 
   const created = await context.post('/board', {
     headers: { Authorization: `Bearer ${t1}` },
-    data: { content: 'Temp' }
+    data: { headline: 'Temp', content: 'Temp' }
   });
   const { id } = await created.json();
   const com = await context.post(`/board/${id}/comments`, {

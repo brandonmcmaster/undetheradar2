@@ -252,7 +252,7 @@
     },
     "/board": {
       "get": {"summary": "List board posts", "description": "Posts include `updated_at` when edited", "responses": {"200": {"description": "Posts"}}},
-      "post": {"summary": "Create board post", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["content"], "properties": {"content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
+      "post": {"summary": "Create board post", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["headline", "content"], "properties": {"headline": {"type": "string"}, "content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
     },
     "/board/user/{id}": {
       "get": {"summary": "Posts by user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Posts"}}}
@@ -272,7 +272,7 @@
       "delete": {"summary": "Delete comment", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Deleted"}}}
     },
     "/board/{id}": {
-      "put": {"summary": "Edit post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["content"], "properties": {"content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Updated"}}},
+      "put": {"summary": "Edit post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["headline", "content"], "properties": {"headline": {"type": "string"}, "content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Updated"}}},
       "delete": {"summary": "Delete post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Deleted"}}}
     },
     "/health": {
