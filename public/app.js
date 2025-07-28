@@ -22,8 +22,20 @@ function useToken() {
 }
 
 function Nav({ auth }) {
+  const [avatar, setAvatar] = React.useState(null);
+
+  React.useEffect(() => {
+    if (!auth.token || !auth.userId) {
+      setAvatar(null);
+      return;
+    }
+    fetch(`/users/${auth.userId}`)
+      .then(r => r.json())
+      .then(u => setAvatar(u.avatar_id || null));
+  }, [auth.token, auth.userId]);
+
   return (
-    <nav className="bg-blue-800 text-white p-2 flex flex-wrap space-x-4">
+    <nav className="bg-blue-800 text-white p-2 flex items-center space-x-4">
       <Link className="hover:underline" to="/">Home</Link>
       <Link className="hover:underline" to="/browse">Browse</Link>
       <Link className="hover:underline" to="/media">Media</Link>
@@ -33,10 +45,16 @@ function Nav({ auth }) {
       <Link className="hover:underline" to="/shows">Shows</Link>
       <Link className="hover:underline" to="/merch">Merch</Link>
       {auth.token ? (
-        <React.Fragment>
-          <Link className="hover:underline" to="/profile">Profile</Link>
-          <button className="ml-auto" onClick={auth.clear}>Logout</button>
-        </React.Fragment>
+        <div className="ml-auto flex items-center space-x-2">
+          <Link to="/profile">
+            {avatar ? (
+              <img className="w-8 h-8 rounded-full" src={`/media/${avatar}`} alt="avatar" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs">N/A</div>
+            )}
+          </Link>
+          <button onClick={auth.clear}>Logout</button>
+        </div>
       ) : (
         <Link className="ml-auto hover:underline" to="/signin">Sign In</Link>
       )}
