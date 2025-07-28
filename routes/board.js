@@ -107,6 +107,35 @@ router.post(
   }
 );
 
+// Update a board post
+router.put(
+  '/:id',
+  authenticate,
+  param('id').isInt(),
+  body('content').trim().notEmpty().escape(),
+  validate,
+  (req, res, next) => {
+    const { content } = req.body;
+    db.get('SELECT user_id FROM board_posts WHERE id = ?', [req.params.id], (err, row) => {
+      if (err) return next(err);
+      if (!row) {
+        const nf = new Error('Post not found');
+        nf.status = 404;
+        return next(nf);
+      }
+      if (row.user_id !== req.user.id) {
+        const no = new Error('Not allowed');
+        no.status = 403;
+        return next(no);
+      }
+      db.run('UPDATE board_posts SET content = ? WHERE id = ?', [content, req.params.id], err2 => {
+        if (err2) return next(err2);
+        res.json({ success: true });
+      });
+    });
+  }
+);
+
 // Update a comment
 router.put(
   '/comments/:id',

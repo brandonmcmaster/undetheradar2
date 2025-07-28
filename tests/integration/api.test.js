@@ -139,6 +139,26 @@ test('board post interactions', async () => {
   expect(list.find(c => c.content === 'Nice')).toBeTruthy();
 });
 
+test('board post editing', async () => {
+  const reg = await context.post('/auth/register', {
+    data: { name: 'Mia', username: 'mia', password: 'pw' }
+  });
+  const { token } = await reg.json();
+  const created = await context.post('/board', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { content: 'Original' }
+  });
+  const { id } = await created.json();
+  const edit = await context.put(`/board/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { content: 'Edited' }
+  });
+  expect(edit.ok()).toBeTruthy();
+  const posts = await context.get('/board');
+  const arr = await posts.json();
+  expect(arr.find(p => p.id === id).content).toBe('Edited');
+});
+
 test('comment editing and post deletion', async () => {
   const u1 = await context.post('/auth/register', {
     data: { name: 'Ken', username: 'ken', password: 'pw' }
