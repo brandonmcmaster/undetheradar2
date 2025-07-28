@@ -30,14 +30,28 @@ const upload = multer({
 
 // Get all users
 router.get('/', (req, res) => {
-  let sql = 'SELECT id, name, username, email, bio, social, avatar_id, is_artist FROM users';
-  const { type } = req.query;
+  let sql =
+    'SELECT id, name, username, email, bio, social, avatar_id, is_artist FROM users';
+  const params = [];
+  const { type, q, letter } = req.query;
+  const conditions = [];
   if (type === 'artist') {
-    sql += ' WHERE is_artist = 1';
+    conditions.push('is_artist = 1');
   } else if (type === 'user') {
-    sql += ' WHERE is_artist = 0';
+    conditions.push('is_artist = 0');
   }
-  db.all(sql, [], (err, rows) => {
+  if (q) {
+    conditions.push('(name LIKE ? COLLATE NOCASE OR username LIKE ? COLLATE NOCASE)');
+    params.push(`%${q}%`, `%${q}%`);
+  }
+  if (letter) {
+    conditions.push('(name LIKE ? COLLATE NOCASE OR username LIKE ? COLLATE NOCASE)');
+    params.push(`${letter}%`, `${letter}%`);
+  }
+  if (conditions.length) {
+    sql += ' WHERE ' + conditions.join(' AND ');
+  }
+  db.all(sql, params, (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });

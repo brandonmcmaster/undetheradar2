@@ -262,3 +262,25 @@ test('user type filtering works', async () => {
   const fanList = await fans.json();
   expect(fanList.every(u => u.is_artist === 0)).toBeTruthy();
 });
+
+test('user search works', async () => {
+  await context.post('/auth/register', {
+    data: { name: 'Alice', username: 'alice123', password: 'pw', is_artist: true }
+  });
+  await context.post('/auth/register', {
+    data: { name: 'Bob', username: 'bobby', password: 'pw', is_artist: false }
+  });
+  await context.post('/auth/register', {
+    data: { name: 'Charlie', username: 'charlie', password: 'pw', is_artist: true }
+  });
+
+  const search = await context.get('/users?q=obb');
+  const searchList = await search.json();
+  expect(searchList.length).toBe(1);
+  expect(searchList[0].username).toBe('bobby');
+
+  const letter = await context.get('/users?letter=C&type=artist');
+  const letterList = await letter.json();
+  expect(letterList.length).toBe(1);
+  expect(letterList[0].username).toBe('charlie');
+});
