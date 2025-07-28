@@ -139,6 +139,53 @@ test('board post interactions', async () => {
   expect(list.find(c => c.content === 'Nice')).toBeTruthy();
 });
 
+test('comment editing and post deletion', async () => {
+  const u1 = await context.post('/auth/register', {
+    data: { name: 'Ken', username: 'ken', password: 'pw' }
+  });
+  const { token: t1 } = await u1.json();
+  const u2 = await context.post('/auth/register', {
+    data: { name: 'Liz', username: 'liz', password: 'pw' }
+  });
+  const { token: t2 } = await u2.json();
+
+  const created = await context.post('/board', {
+    headers: { Authorization: `Bearer ${t1}` },
+    data: { content: 'Temp' }
+  });
+  const { id } = await created.json();
+  const com = await context.post(`/board/${id}/comments`, {
+    headers: { Authorization: `Bearer ${t2}` },
+    data: { content: 'First' }
+  });
+  const { id: cid } = await com.json();
+
+  const edit = await context.put(`/board/comments/${cid}`, {
+    headers: { Authorization: `Bearer ${t2}` },
+    data: { content: 'Updated' }
+  });
+  expect(edit.ok()).toBeTruthy();
+  const list1 = await context.get(`/board/${id}/comments`);
+  const arr1 = await list1.json();
+  expect(arr1.find(c => c.id === cid).content).toBe('Updated');
+
+  const delc = await context.delete(`/board/comments/${cid}`, {
+    headers: { Authorization: `Bearer ${t2}` }
+  });
+  expect(delc.ok()).toBeTruthy();
+  const list2 = await context.get(`/board/${id}/comments`);
+  const arr2 = await list2.json();
+  expect(arr2.length).toBe(0);
+
+  const del = await context.delete(`/board/${id}`, {
+    headers: { Authorization: `Bearer ${t1}` }
+  });
+  expect(del.ok()).toBeTruthy();
+  const posts = await context.get('/board');
+  const after = await posts.json();
+  expect(after.find(p => p.id === id)).toBeUndefined();
+});
+
 test('health check works', async () => {
   const res = await context.get('/health');
   expect(res.ok()).toBeTruthy();

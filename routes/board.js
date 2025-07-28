@@ -107,4 +107,79 @@ router.post(
   }
 );
 
+// Update a comment
+router.put(
+  '/comments/:id',
+  authenticate,
+  param('id').isInt(),
+  body('content').trim().notEmpty().escape(),
+  validate,
+  (req, res, next) => {
+    const { content } = req.body;
+    db.get('SELECT user_id FROM board_comments WHERE id = ?', [req.params.id], (err, row) => {
+      if (err) return next(err);
+      if (!row) {
+        const nf = new Error('Comment not found');
+        nf.status = 404;
+        return next(nf);
+      }
+      if (row.user_id !== req.user.id) {
+        const no = new Error('Not allowed');
+        no.status = 403;
+        return next(no);
+      }
+      db.run(
+        'UPDATE board_comments SET content = ? WHERE id = ?',
+        [content, req.params.id],
+        err2 => {
+          if (err2) return next(err2);
+          res.json({ success: true });
+        }
+      );
+    });
+  }
+);
+
+// Delete a comment
+router.delete('/comments/:id', authenticate, param('id').isInt(), validate, (req, res, next) => {
+  db.get('SELECT user_id FROM board_comments WHERE id = ?', [req.params.id], (err, row) => {
+    if (err) return next(err);
+    if (!row) {
+      const nf = new Error('Comment not found');
+      nf.status = 404;
+      return next(nf);
+    }
+    if (row.user_id !== req.user.id) {
+      const no = new Error('Not allowed');
+      no.status = 403;
+      return next(no);
+    }
+    db.run('DELETE FROM board_comments WHERE id = ?', [req.params.id], err2 => {
+      if (err2) return next(err2);
+      res.json({ success: true });
+    });
+  });
+});
+
+// Delete a board post
+router.delete('/:id', authenticate, param('id').isInt(), validate, (req, res, next) => {
+  db.get('SELECT user_id FROM board_posts WHERE id = ?', [req.params.id], (err, row) => {
+    if (err) return next(err);
+    if (!row) {
+      const nf = new Error('Post not found');
+      nf.status = 404;
+      return next(nf);
+    }
+    if (row.user_id !== req.user.id) {
+      const no = new Error('Not allowed');
+      no.status = 403;
+      return next(no);
+    }
+    db.run('DELETE FROM board_posts WHERE id = ?', [req.params.id], err2 => {
+      if (err2) return next(err2);
+      res.json({ success: true });
+    });
+  });
+});
+
 module.exports = router;

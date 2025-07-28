@@ -567,6 +567,8 @@ function Board({ auth }) {
   const [content, setContent] = React.useState('');
   const [expanded, setExpanded] = React.useState(null);
   const [comments, setComments] = React.useState({});
+  const [editing, setEditing] = React.useState(null);
+  const [editText, setEditText] = React.useState('');
 
   const load = () => {
     fetch('/board')
@@ -621,6 +623,35 @@ function Board({ auth }) {
       .then(() => loadComments(id));
   };
 
+  const updateComment = (cid, pid, text) => {
+    fetch(`/board/comments/${cid}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${auth.token}`
+      },
+      body: JSON.stringify({ content: text })
+    }).then(() => {
+      setEditing(null);
+      setEditText('');
+      loadComments(pid);
+    });
+  };
+
+  const removeComment = (cid, pid) => {
+    fetch(`/board/comments/${cid}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${auth.token}` }
+    }).then(() => loadComments(pid));
+  };
+
+  const removePost = id => {
+    fetch(`/board/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${auth.token}` }
+    }).then(load);
+  };
+
   return (
     <div className="p-4 space-y-2">
       {auth.token && (
@@ -657,13 +688,49 @@ function Board({ auth }) {
                 Dislike ({p.dislikes})
               </button>
               <span>Comments: {p.comments}</span>
+              {auth.userId == p.user_id && (
+                <button className="text-sm text-red-700" onClick={() => removePost(p.id)}>
+                  Delete
+                </button>
+              )}
             </div>
             {expanded === p.id && (
               <div className="mt-2 space-y-1">
                 {(comments[p.id] || []).map(c => (
                   <div key={c.id} className="border-t pt-1 text-sm">
                     <span className="font-bold mr-1">{c.username}:</span>
-                    {c.content}
+                    {editing === c.id ? (
+                      <React.Fragment>
+                        <input
+                          className="border p-0.5 mr-1"
+                          value={editText}
+                          onChange={e => setEditText(e.target.value)}
+                        />
+                        <button
+                          className="text-green-600 mr-1"
+                          onClick={() => updateComment(c.id, p.id, editText)}
+                        >
+                          Save
+                        </button>
+                        <button className="text-gray-600" onClick={() => setEditing(null)}>
+                          Cancel
+                        </button>
+                      </React.Fragment>
+                    ) : (
+                      <React.Fragment>
+                        {c.content}
+                        {auth.userId == c.user_id && (
+                          <span className="ml-2 space-x-1">
+                            <button className="text-blue-600" onClick={() => { setEditing(c.id); setEditText(c.content); }}>
+                              Edit
+                            </button>
+                            <button className="text-red-600" onClick={() => removeComment(c.id, p.id)}>
+                              Delete
+                            </button>
+                          </span>
+                        )}
+                      </React.Fragment>
+                    )}
                   </div>
                 ))}
                 {auth.token && (

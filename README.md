@@ -193,6 +193,9 @@ user who uploaded each file.
 - `POST /board/:id/dislike` – dislike a post (requires authentication)
 - `GET /board/:id/comments` – list comments on a post
 - `POST /board/:id/comments` – add a comment (requires authentication)
+- `PUT /board/comments/:id` – edit a comment (requires authentication)
+- `DELETE /board/comments/:id` – delete a comment (requires authentication)
+- `DELETE /board/:id` – delete a board post (requires authentication)
 
 ### Misc
 
