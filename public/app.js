@@ -21,7 +21,7 @@ function useToken() {
   return { token, userId, saveToken, clear };
 }
 
-function Nav({ auth }) {
+function Nav({ auth, unread }) {
   const [avatar, setAvatar] = React.useState(null);
 
   React.useEffect(() => {
@@ -54,7 +54,12 @@ function Nav({ auth }) {
       <Link className="hover:underline" to="/browse">Browse</Link>
       <Link className="hover:underline" to="/media">Media</Link>
       <Link className="hover:underline" to="/messages">Messages</Link>
-      <Link className="hover:underline" to="/notifications">Notifications</Link>
+      <Link className="hover:underline relative" to="/notifications">
+        Notifications
+        {unread > 0 && (
+          <span className="ml-1 bg-red-600 text-white rounded-full px-1 text-xs">{unread}</span>
+        )}
+      </Link>
       <Link className="hover:underline" to="/board">Board</Link>
       <Link className="hover:underline" to="/shows">Shows</Link>
       <Link className="hover:underline" to="/merch">Merch</Link>
@@ -512,16 +517,20 @@ function Messages({ auth }) {
   );
 }
 
-function Notifications({ auth }) {
+function Notifications({ auth, refreshUnread }) {
   const [items, setItems] = React.useState([]);
   const load = () => {
     if (!auth.token) return;
     fetch('/notifications', { headers: { Authorization: `Bearer ${auth.token}` } })
       .then(r => r.json())
-      .then(setItems);
+      .then(arr => {
+        setItems(arr);
+        if (refreshUnread) refreshUnread();
+      });
   };
   const mark = id => {
-    fetch(`/notifications/${id}/read`, { method: 'POST', headers: { Authorization: `Bearer ${auth.token}` } }).then(load);
+    fetch(`/notifications/${id}/read`, { method: 'POST', headers: { Authorization: `Bearer ${auth.token}` } })
+      .then(load);
   };
   React.useEffect(load, [auth.token]);
   if (!auth.token) return <div className="p-4">Please sign in.</div>;
@@ -921,10 +930,25 @@ function Placeholder({ text }) {
 
 function App() {
   const auth = useToken();
+  const [unread, setUnread] = React.useState(0);
+
+  const loadUnread = () => {
+    if (!auth.token) {
+      setUnread(0);
+      return;
+    }
+    fetch('/notifications/unread_count', {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+      .then(r => r.json())
+      .then(d => setUnread(d.count));
+  };
+
+  React.useEffect(loadUnread, [auth.token]);
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50 font-retro">
-        <Nav auth={auth} />
+        <Nav auth={auth} unread={unread} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn auth={auth} />} />
@@ -936,7 +960,7 @@ function App() {
           <Route path="/users" element={<UsersPage />} />
           <Route path="/users/:id" element={<UserDetail />} />
           <Route path="/messages" element={<Messages auth={auth} />} />
-          <Route path="/notifications" element={<Notifications auth={auth} />} />
+          <Route path="/notifications" element={<Notifications auth={auth} refreshUnread={loadUnread} />} />
           <Route path="/media" element={<Media auth={auth} />} />
           <Route path="/board" element={<Board auth={auth} />} />
           <Route path="/shows" element={<Placeholder text="Show calendar" />} />

@@ -209,6 +209,7 @@ user who uploaded each file.
 
 - `GET /notifications` – list notifications for the authenticated user
 - `POST /notifications/:id/read` – mark a notification as read
+- `GET /notifications/unread_count` – get count of unread notifications
 
 ### Misc
 
