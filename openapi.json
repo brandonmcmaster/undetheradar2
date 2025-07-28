@@ -289,6 +289,9 @@
     "/notifications": {
       "get": {"summary": "List notifications", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Notifications"}}}
     },
+    "/notifications/unread_count": {
+      "get": {"summary": "Unread notifications count", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Count"}}}
+    },
     "/notifications/{id}/read": {
       "post": {"summary": "Mark notification read", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Updated"}}}
     },

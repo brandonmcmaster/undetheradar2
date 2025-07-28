@@ -386,3 +386,38 @@ test('follow and notifications work', async () => {
   });
   expect(mark.ok()).toBeTruthy();
 });
+
+test('notifications unread count works', async () => {
+  const u1 = await context.post('/auth/register', {
+    data: { name: 'C', username: 'cc', password: 'pw' }
+  });
+  const { token: t1 } = await u1.json();
+  const u2 = await context.post('/auth/register', {
+    data: { name: 'D', username: 'dd', password: 'pw' }
+  });
+  const { token: t2, id: id2 } = await u2.json();
+
+  await context.post(`/follow/${id2}`, {
+    headers: { Authorization: `Bearer ${t1}` }
+  });
+
+  const count1 = await context.get('/notifications/unread_count', {
+    headers: { Authorization: `Bearer ${t2}` }
+  });
+  const { count } = await count1.json();
+  expect(count).toBeGreaterThan(0);
+
+  const list = await context.get('/notifications', {
+    headers: { Authorization: `Bearer ${t2}` }
+  });
+  const arr = await list.json();
+  await context.post(`/notifications/${arr[0].id}/read`, {
+    headers: { Authorization: `Bearer ${t2}` }
+  });
+
+  const count2 = await context.get('/notifications/unread_count', {
+    headers: { Authorization: `Bearer ${t2}` }
+  });
+  const { count: newCount } = await count2.json();
+  expect(newCount).toBe(count - 1);
+});
