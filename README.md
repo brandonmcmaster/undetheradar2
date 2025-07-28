@@ -24,7 +24,7 @@ minimal dependencies. Structured logs are produced with **Pino**. Current endpoi
 
 - `POST /auth/register` – create an account (set `is_artist` to `true` for artist profiles)
 - `POST /auth/login` – obtain a JWT
-- `GET /users` – list user profiles (`?type=artist` or `?type=user` to filter)
+- `GET /users` – list user profiles (`?type=artist` or `?type=user` to filter, `?q=` to search, `?letter=` to filter by first letter)
 - `POST /users` – update the authenticated user's profile
 - `GET /users/:id` – fetch a user by id
 - `POST /users/avatar` – upload a profile picture (requires authentication)
@@ -128,7 +128,7 @@ curl -X POST http://localhost:3000/auth/login \
 
 ### `/users`
 
-- `GET /users` – list users (`?type=artist` or `?type=user` to filter)
+- `GET /users` – list users (`?type=artist` or `?type=user` to filter, `?q=` to search, `?letter=` to filter by first letter)
 - `POST /users` – update the authenticated user's profile
 - `GET /users/:id` – fetch a user by id
 - `POST /users/avatar` – upload or update your profile picture

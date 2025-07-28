@@ -243,11 +243,17 @@ function EditProfile({ auth }) {
 function Browse({ defaultTab = 'artist' }) {
   const [tab, setTab] = React.useState(defaultTab);
   const [users, setUsers] = React.useState([]);
-  React.useEffect(() => {
-    fetch(`/users?type=${tab}`)
+  const [query, setQuery] = React.useState('');
+  const [letter, setLetter] = React.useState('');
+  const load = () => {
+    let url = `/users?type=${tab}`;
+    if (query) url += `&q=${encodeURIComponent(query)}`;
+    if (letter) url += `&letter=${letter}`;
+    fetch(url)
       .then(r => r.json())
       .then(setUsers);
-  }, [tab]);
+  };
+  React.useEffect(load, [tab, query, letter]);
   const base = tab === 'artist' ? '/artists/' : '/users/';
   return (
     <div className="p-4">
@@ -264,6 +270,32 @@ function Browse({ defaultTab = 'artist' }) {
         >
           Users
         </button>
+      </div>
+      <div className="mb-2">
+        <input
+          className="border p-1 mr-2"
+          placeholder="Search..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+        />
+        <button className="border px-2 py-1" onClick={() => setQuery('')}>Clear</button>
+      </div>
+      <div className="mb-4 flex flex-wrap space-x-1">
+        <button
+          className={`px-2 py-1 ${letter === '' ? 'bg-blue-600 text-white' : 'bg-white border'}`}
+          onClick={() => setLetter('')}
+        >
+          All
+        </button>
+        {Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i)).map(l => (
+          <button
+            key={l}
+            className={`px-2 py-1 ${letter === l ? 'bg-blue-600 text-white' : 'bg-white border'}`}
+            onClick={() => setLetter(l)}
+          >
+            {l}
+          </button>
+        ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {users.map(u => (
