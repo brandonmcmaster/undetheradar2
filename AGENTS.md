@@ -14,7 +14,7 @@ This project is a Node.js Express server using CommonJS modules and SQLite for p
 - New tables: `shows`, `merch`, `board_posts`, `board_reactions`, `board_comments`, `profile_media`, `follows` and `notifications`.
 - Gamification tables: `fan_levels`, `artist_levels`, `fan_badges`, `artist_badges`, `user_fan_badges`, `user_artist_badges`.
 - The `board_posts` table includes an optional `updated_at` column set when a post is edited.
-- The `users` table now includes `is_artist`, `fan_points`, `artist_points`, `fan_level_id` and `artist_level_id` columns.
+- The `users` table now includes `is_artist`, `fan_points`, `artist_points`, `fan_level_id`, `artist_level_id` and `profile_theme` columns.
 - Use `utils/gamify.js` helpers to award points or badges.
 
 ## Media uploads

@@ -32,7 +32,7 @@ const upload = multer({
 // Get all users
 router.get('/', (req, res) => {
   let sql =
-    'SELECT id, name, username, email, bio, social, custom_html, avatar_id, is_artist, fan_points, artist_points FROM users';
+    'SELECT id, name, username, email, bio, social, custom_html, profile_theme, avatar_id, is_artist, fan_points, artist_points FROM users';
   const params = [];
   const { type, q, letter } = req.query;
   const conditions = [];
@@ -67,13 +67,20 @@ router.post(
   body('bio').optional().escape(),
   body('social').optional().escape(),
   body('custom_html').optional().isString(),
+  body('profile_theme').optional().isString(),
   validate,
   (req, res, next) => {
-    const { name, email, bio, social, custom_html } = req.body;
-    const safeHtml = custom_html ? sanitizeHtml(custom_html) : undefined;
+    const { name, email, bio, social, custom_html, profile_theme } = req.body;
+    const safeHtml = custom_html
+      ? sanitizeHtml(custom_html, {
+          allowedTags: false,
+          allowedAttributes: { '*': ['id', 'class', 'style', 'href', 'src'] },
+          exclusiveFilter: f => f.tag === 'script' || f.tag === 'style'
+        })
+      : undefined;
     db.run(
-      'UPDATE users SET name = ?, email = ?, bio = ?, social = ?, custom_html = ? WHERE id = ?',
-      [name, email, bio, social, safeHtml, req.user.id],
+      'UPDATE users SET name = ?, email = ?, bio = ?, social = ?, custom_html = ?, profile_theme = ? WHERE id = ?',
+      [name, email, bio, social, safeHtml, profile_theme, req.user.id],
       function (err) {
         if (err) return next(err);
         res.json({ updated: this.changes });
@@ -124,7 +131,7 @@ router.get(
   validate,
   (req, res, next) => {
     db.get(
-      'SELECT id, name, username, email, bio, social, custom_html, avatar_id, is_artist, fan_points, artist_points FROM users WHERE id = ?',
+      'SELECT id, name, username, email, bio, social, custom_html, profile_theme, avatar_id, is_artist, fan_points, artist_points FROM users WHERE id = ?',
       [req.params.id],
       (err, row) => {
         if (err) return next(err);
