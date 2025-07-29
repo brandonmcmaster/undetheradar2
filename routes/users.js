@@ -83,6 +83,7 @@ router.post(
       [req.user.id],
       (err, row) => {
         if (err) return next(err);
+        if (!row) return res.status(404).json({ error: 'User not found' });
         const newVals = {
           name: name !== undefined ? name : row.name,
           email: email !== undefined ? email : row.email,
@@ -158,7 +159,7 @@ router.get(
       [req.params.id],
       (err, row) => {
         if (err) return next(err);
-        if (!row) return next(new Error('User not found'));
+        if (!row) return res.status(404).json({ error: 'User not found' });
         res.json(row);
       }
     );
