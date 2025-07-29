@@ -67,6 +67,7 @@ Babel) are included in the repository under `public/vendor` so the site works
 without hitting external CDNs. The UI embraces a retro internet vibe and
  provides pages for signing in, choosing an Artist or regular User profile during registration, and browsing community profiles via the new `/browse` page which features tabs to switch between artists and users. You can also view your profile and edit it at `/profile/edit`. When signed in, your profile picture appears in the top-right corner of the navigation bar and links back to your profile. Your username is displayed beside the avatar so you know which account is active. Use the "Edit Profile" button on your profile page to update details, pick a color theme or add custom HTML for deeper customization. Placeholders for the upcoming
 show calendar and merch shop are also included.
+Any other route will also load `index.html` so client-side routing works.
 Swagger documentation is available at [http://localhost:3000/docs](http://localhost:3000/docs).
 Click a profile on the Browse page to view details at `/artists/:id` or `/users/:id`.
 
