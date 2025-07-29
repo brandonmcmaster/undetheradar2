@@ -421,3 +421,49 @@ test('notifications unread count works', async () => {
   const { count: newCount } = await count2.json();
   expect(newCount).toBe(count - 1);
 });
+
+test('feed endpoints return followed content', async () => {
+  const a = await context.post('/auth/register', {
+    data: { name: 'FeedA', username: 'feeda', password: 'pw' }
+  });
+  const { token: ta } = await a.json();
+
+  const b = await context.post('/auth/register', {
+    data: { name: 'FeedB', username: 'feedb', password: 'pw' }
+  });
+  const { token: tb, id: idB } = await b.json();
+
+  await context.post('/board', {
+    headers: { Authorization: `Bearer ${tb}` },
+    data: { headline: 'Hello', content: 'World' }
+  });
+  await context.post('/shows', {
+    headers: { Authorization: `Bearer ${tb}` },
+    data: { venue: 'Venue', date: '2031-01-01' }
+  });
+  await context.post('/merch', {
+    headers: { Authorization: `Bearer ${tb}` },
+    data: { product_name: 'Item', price: 5 }
+  });
+
+  let feed = await context.get('/board/feed', {
+    headers: { Authorization: `Bearer ${ta}` }
+  });
+  expect((await feed.json()).length).toBe(0);
+
+  await context.post(`/follow/${idB}`, {
+    headers: { Authorization: `Bearer ${ta}` }
+  });
+
+  feed = await context.get('/board/feed', {
+    headers: { Authorization: `Bearer ${ta}` }
+  });
+  const posts = await feed.json();
+  expect(posts.length).toBe(1);
+
+  const shows = await (await context.get('/shows/feed', { headers: { Authorization: `Bearer ${ta}` } })).json();
+  expect(shows.length).toBe(1);
+
+  const merch = await (await context.get('/merch/feed', { headers: { Authorization: `Bearer ${ta}` } })).json();
+  expect(merch.length).toBe(1);
+});

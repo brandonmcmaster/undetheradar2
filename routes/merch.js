@@ -21,6 +21,17 @@ router.get('/user/:id', param('id').isInt(), validate, (req, res, next) => {
   });
 });
 
+// Merch from followed users
+router.get('/feed', authenticate, (req, res, next) => {
+  const sql = `SELECT merch.* FROM merch
+    JOIN follows ON follows.followed_id = merch.user_id
+    WHERE follows.follower_id = ?`;
+  db.all(sql, [req.user.id], (err, rows) => {
+    if (err) return next(err);
+    res.json(rows);
+  });
+});
+
 // Create a merch item
 router.post(
   '/',

@@ -39,6 +39,24 @@ router.get('/user/:id', param('id').isInt(), validate, (req, res, next) => {
   });
 });
 
+// Get posts from followed users
+router.get('/feed', authenticate, (req, res, next) => {
+  const sql = `
+    SELECT board_posts.*, users.username,
+      (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = 1) AS likes,
+      (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = -1) AS dislikes,
+      (SELECT COUNT(*) FROM board_comments WHERE post_id = board_posts.id) AS comments
+    FROM board_posts
+    JOIN users ON board_posts.user_id = users.id
+    JOIN follows ON follows.followed_id = board_posts.user_id
+    WHERE follows.follower_id = ?
+    ORDER BY created_at DESC`;
+  db.all(sql, [req.user.id], (err, rows) => {
+    if (err) return next(err);
+    res.json(rows);
+  });
+});
+
 // Create a board post
 router.post(
   '/',
