@@ -121,7 +121,7 @@
             "content": {
               "application/json": {
                 "example": [
-                  {"id": 1, "name": "Alice"}
+                  {"id": 1, "name": "Alice", "custom_html": "<div>Hi</div>"}
                 ]
               }
             }
@@ -162,7 +162,7 @@
       "get": {
         "summary": "Fetch a user by id",
         "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}],
-        "responses": {"200": {"description": "User", "content": {"application/json": {"example": {"id": 1, "name": "Alice"}}}}}
+        "responses": {"200": {"description": "User", "content": {"application/json": {"example": {"id": 1, "name": "Alice", "custom_html": "<div>Hi</div>"}}}}}
       }
     },
     "/messages/inbox": {

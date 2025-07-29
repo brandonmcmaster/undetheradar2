@@ -97,6 +97,12 @@ function Nav({ auth, unread }) {
         <span className="mr-1" role="img" aria-label="merch">🛍️</span>
         Merch
       </Link>
+      {auth.token && (
+        <Link className="hover:underline flex items-center" to="/profile/edit">
+          <span className="mr-1" role="img" aria-label="customize">🎨</span>
+          Customize
+        </Link>
+      )}
     </nav>
   );
 }
@@ -225,6 +231,9 @@ function Profile({ auth }) {
         <div className="text-sm">@{profile.username}</div>
         <div>Email: {profile.email || 'N/A'}</div>
         <div>Bio: {profile.bio || 'N/A'}</div>
+        {profile.custom_html && (
+          <div dangerouslySetInnerHTML={{ __html: profile.custom_html }} />
+        )}
         <button className="bg-gray-300 px-2 py-1" onClick={() => nav('/profile/edit')}>Edit Profile</button>
       </div>
       <div>
@@ -248,6 +257,7 @@ function EditProfile({ auth }) {
   const [email, setEmail] = React.useState('');
   const [bio, setBio] = React.useState('');
   const [social, setSocial] = React.useState('');
+  const [customHtml, setCustomHtml] = React.useState('');
   const nav = useNavigate();
 
   React.useEffect(() => {
@@ -259,6 +269,7 @@ function EditProfile({ auth }) {
         setEmail(u.email || '');
         setBio(u.bio || '');
         setSocial(u.social || '');
+        setCustomHtml(u.custom_html || '');
       });
   }, [auth]);
 
@@ -269,7 +280,7 @@ function EditProfile({ auth }) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${auth.token}`
       },
-      body: JSON.stringify({ name, email, bio, social })
+      body: JSON.stringify({ name, email, bio, social, custom_html: customHtml })
     }).then(() => nav('/profile'));
   };
 
@@ -292,6 +303,10 @@ function EditProfile({ auth }) {
       <div>
         <label className="block">Social</label>
         <input className="border p-1 w-full" value={social} onChange={e => setSocial(e.target.value)} />
+      </div>
+      <div>
+        <label className="block">Custom HTML</label>
+        <textarea className="border p-1 w-full" value={customHtml} onChange={e => setCustomHtml(e.target.value)} />
       </div>
       <button className="bg-blue-600 text-white px-2 py-1" onClick={save}>Save</button>
     </div>
@@ -429,6 +444,9 @@ function UserDetail() {
       </div>
       <div>Email: {user.email || 'N/A'}</div>
       <div>Bio: {user.bio || 'N/A'}</div>
+      {user.custom_html && (
+        <div dangerouslySetInnerHTML={{ __html: user.custom_html }} />
+      )}
       <div>Social: {user.social || 'N/A'}</div>
       <div>
         <div className="font-bold mb-1">Media</div>
@@ -489,6 +507,9 @@ function ArtistDetail() {
       </div>
       <div>Email: {user.email || 'N/A'}</div>
       <div>Bio: {user.bio || 'N/A'}</div>
+      {user.custom_html && (
+        <div dangerouslySetInnerHTML={{ __html: user.custom_html }} />
+      )}
       <div>Social: {user.social || 'N/A'}</div>
       <div>
         <div className="font-bold mb-1">Media</div>
