@@ -78,12 +78,35 @@ router.post(
           exclusiveFilter: f => f.tag === 'script' || f.tag === 'style'
         })
       : undefined;
-    db.run(
-      'UPDATE users SET name = ?, email = ?, bio = ?, social = ?, custom_html = ?, profile_theme = ? WHERE id = ?',
-      [name, email, bio, social, safeHtml, profile_theme, req.user.id],
-      function (err) {
+    db.get(
+      'SELECT name, email, bio, social, custom_html, profile_theme FROM users WHERE id = ?',
+      [req.user.id],
+      (err, row) => {
         if (err) return next(err);
-        res.json({ updated: this.changes });
+        const newVals = {
+          name: name !== undefined ? name : row.name,
+          email: email !== undefined ? email : row.email,
+          bio: bio !== undefined ? bio : row.bio,
+          social: social !== undefined ? social : row.social,
+          custom_html: safeHtml !== undefined ? safeHtml : row.custom_html,
+          profile_theme: profile_theme !== undefined ? profile_theme : row.profile_theme
+        };
+        db.run(
+          'UPDATE users SET name = ?, email = ?, bio = ?, social = ?, custom_html = ?, profile_theme = ? WHERE id = ?',
+          [
+            newVals.name,
+            newVals.email,
+            newVals.bio,
+            newVals.social,
+            newVals.custom_html,
+            newVals.profile_theme,
+            req.user.id
+          ],
+          function (err2) {
+            if (err2) return next(err2);
+            res.json({ updated: this.changes });
+          }
+        );
       }
     );
   }
