@@ -318,6 +318,23 @@ test('metrics endpoint responds', async () => {
   expect(typeof body.avgResponseTime).toBe('number');
 });
 
+test('profile custom HTML is sanitized and stored', async () => {
+  const reg = await context.post('/auth/register', {
+    data: { name: 'HTML', username: 'htmluser', password: 'pw' }
+  });
+  const { token, id } = await reg.json();
+
+  const html = '<script>alert(1)</script><b>hi</b>';
+  const update = await context.post('/users', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { name: 'HTML', custom_html: html }
+  });
+  expect(update.ok()).toBeTruthy();
+  const user = await context.get(`/users/${id}`);
+  const data = await user.json();
+  expect(data.custom_html).toBe('<b>hi</b>');
+});
+
 test('user type filtering works', async () => {
   await context.post('/auth/register', {
     data: { name: 'Artist', username: 'artist', password: 'pw', is_artist: true }

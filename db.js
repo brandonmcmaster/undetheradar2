@@ -16,6 +16,7 @@ const init = () => {
       email TEXT,
       bio TEXT,
       social TEXT,
+      custom_html TEXT,
       is_artist INTEGER DEFAULT 0
     )`);
 
@@ -182,6 +183,9 @@ const init = () => {
       }
       if (!names.includes('is_artist')) {
         db.run('ALTER TABLE users ADD COLUMN is_artist INTEGER DEFAULT 0');
+      }
+      if (!names.includes('custom_html')) {
+        db.run('ALTER TABLE users ADD COLUMN custom_html TEXT');
       }
       if (!names.includes('fan_points')) {
         db.run('ALTER TABLE users ADD COLUMN fan_points INTEGER DEFAULT 0');
