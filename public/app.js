@@ -51,24 +51,52 @@ function Nav({ auth, unread }) {
             )}
           </Link>
           <span className="text-sm">@{username}</span>
-          <button onClick={auth.clear}>Logout</button>
+          <button className="flex items-center" onClick={auth.clear}>
+            <span className="mr-1" role="img" aria-label="logout">🚪</span>
+            Logout
+          </button>
         </div>
       ) : (
-        <Link className="hover:underline" to="/signin">Sign In</Link>
+        <Link className="hover:underline flex items-center" to="/signin">
+          <span className="mr-1" role="img" aria-label="sign in">🔐</span>
+          Sign In
+        </Link>
       )}
-      <Link className="hover:underline" to="/">Home</Link>
-      <Link className="hover:underline" to="/browse">Browse</Link>
-      <Link className="hover:underline" to="/media">Media</Link>
-      <Link className="hover:underline" to="/messages">Messages</Link>
-      <Link className="hover:underline relative" to="/notifications">
+      <Link className="hover:underline flex items-center" to="/">
+        <span className="mr-1" role="img" aria-label="home">🏠</span>
+        Home
+      </Link>
+      <Link className="hover:underline flex items-center" to="/browse">
+        <span className="mr-1" role="img" aria-label="browse">🔍</span>
+        Browse
+      </Link>
+      <Link className="hover:underline flex items-center" to="/media">
+        <span className="mr-1" role="img" aria-label="media">🖼️</span>
+        Media
+      </Link>
+      <Link className="hover:underline flex items-center" to="/messages">
+        <span className="mr-1" role="img" aria-label="messages">✉️</span>
+        Messages
+      </Link>
+      <Link className="hover:underline relative flex items-center" to="/notifications">
+        <span className="mr-1" role="img" aria-label="notifications">🔔</span>
         Notifications
         {unread > 0 && (
           <span className="ml-1 bg-red-600 text-white rounded-full px-1 text-xs">{unread}</span>
         )}
       </Link>
-      <Link className="hover:underline" to="/board">Board</Link>
-      <Link className="hover:underline" to="/shows">Shows</Link>
-      <Link className="hover:underline" to="/merch">Merch</Link>
+      <Link className="hover:underline flex items-center" to="/board">
+        <span className="mr-1" role="img" aria-label="board">📝</span>
+        Board
+      </Link>
+      <Link className="hover:underline flex items-center" to="/shows">
+        <span className="mr-1" role="img" aria-label="shows">🎸</span>
+        Shows
+      </Link>
+      <Link className="hover:underline flex items-center" to="/merch">
+        <span className="mr-1" role="img" aria-label="merch">🛍️</span>
+        Merch
+      </Link>
     </nav>
   );
 }
