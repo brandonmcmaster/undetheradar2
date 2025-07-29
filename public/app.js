@@ -277,8 +277,21 @@ function EditProfile({ auth }) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${auth.token}`
       },
-      body: JSON.stringify({ name, email, bio, social, custom_html: customHtml, profile_theme: theme })
-    }).then(() => nav('/profile'));
+      body: JSON.stringify({
+        name,
+        email,
+        bio,
+        social,
+        custom_html: customHtml,
+        profile_theme: theme
+      })
+    })
+      .then(async r => {
+        if (!r.ok) throw new Error((await r.json()).error || 'Update failed');
+        return r.json();
+      })
+      .then(() => nav('/profile'))
+      .catch(err => alert(err.message));
   };
 
   if (!auth.token) return <div className="p-4">Please sign in.</div>;
