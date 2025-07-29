@@ -4,3 +4,18 @@ body {
 .font-retro {
   font-family: 'Courier New', monospace;
 }
+
+.theme-default {
+  background-color: #f9fafb;
+  color: #000;
+}
+
+.theme-dark {
+  background-color: #111;
+  color: #eee;
+}
+
+.theme-ocean {
+  background-color: #e0f7fa;
+  color: #014751;
+}

@@ -97,12 +97,7 @@ function Nav({ auth, unread }) {
         <span className="mr-1" role="img" aria-label="merch">🛍️</span>
         Merch
       </Link>
-      {auth.token && (
-        <Link className="hover:underline flex items-center" to="/profile/edit">
-          <span className="mr-1" role="img" aria-label="customize">🎨</span>
-          Customize
-        </Link>
-      )}
+      {/* profile editing moved to the profile page */}
     </nav>
   );
 }
@@ -218,7 +213,7 @@ function Profile({ auth }) {
   if (!profile) return <div className="p-4">Loading...</div>;
 
   return (
-    <div className="p-4 space-y-6 max-w-3xl mx-auto">
+    <div className={`p-4 space-y-6 max-w-3xl mx-auto ${profile.profile_theme || 'theme-default'}`}>
       <div className="flex flex-col items-center space-y-2">
         {profile.avatar_id ? (
           <img className="w-32 h-32 object-cover rounded-full" src={`/media/${profile.avatar_id}`} alt="avatar" />
@@ -258,6 +253,7 @@ function EditProfile({ auth }) {
   const [bio, setBio] = React.useState('');
   const [social, setSocial] = React.useState('');
   const [customHtml, setCustomHtml] = React.useState('');
+  const [theme, setTheme] = React.useState('default');
   const nav = useNavigate();
 
   React.useEffect(() => {
@@ -270,6 +266,7 @@ function EditProfile({ auth }) {
         setBio(u.bio || '');
         setSocial(u.social || '');
         setCustomHtml(u.custom_html || '');
+        setTheme(u.profile_theme || 'default');
       });
   }, [auth]);
 
@@ -280,7 +277,7 @@ function EditProfile({ auth }) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${auth.token}`
       },
-      body: JSON.stringify({ name, email, bio, social, custom_html: customHtml })
+      body: JSON.stringify({ name, email, bio, social, custom_html: customHtml, profile_theme: theme })
     }).then(() => nav('/profile'));
   };
 
@@ -303,6 +300,14 @@ function EditProfile({ auth }) {
       <div>
         <label className="block">Social</label>
         <input className="border p-1 w-full" value={social} onChange={e => setSocial(e.target.value)} />
+      </div>
+      <div>
+        <label className="block">Theme</label>
+        <select className="border p-1 w-full" value={theme} onChange={e => setTheme(e.target.value)}>
+          <option value="default">Default</option>
+          <option value="dark">Dark</option>
+          <option value="ocean">Ocean</option>
+        </select>
       </div>
       <div>
         <label className="block">Custom HTML</label>
@@ -424,7 +429,7 @@ function UserDetail() {
   };
   if (!user) return <div className="p-4">Loading...</div>;
   return (
-    <div className="p-4 space-y-4">
+    <div className={`p-4 space-y-4 ${user.profile_theme || 'theme-default'}`}>
       <Link className="text-blue-600 underline" to="/users">Back to users</Link>
       <div className="flex items-center space-x-4">
         {user.avatar_id ? (
@@ -487,7 +492,7 @@ function ArtistDetail() {
   };
   if (!user) return <div className="p-4">Loading...</div>;
   return (
-    <div className="p-4 space-y-4">
+    <div className={`p-4 space-y-4 ${user.profile_theme || 'theme-default'}`}>
       <Link className="text-blue-600 underline" to="/artists">Back to artists</Link>
       <div className="flex items-center space-x-4">
         {user.avatar_id ? (

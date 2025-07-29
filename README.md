@@ -20,7 +20,7 @@ to:
 - Post updates to a shared bulletin board
 - Follow other users and receive notifications for new activity
 - View posts, shows and merch from people you follow
-- Customize profile pages with sanitized HTML snippets
+- Customize profile pages with sanitized HTML snippets or preset color themes
 
 The backend is built with Node.js, Express and SQLite using CommonJS modules and
 minimal dependencies. Structured logs are produced with **Pino**. Current endpoints include:
@@ -65,7 +65,7 @@ Once running, open [http://localhost:3000](http://localhost:3000) to view the
 React interface. All frontend libraries (React, React Router, Tailwind and
 Babel) are included in the repository under `public/vendor` so the site works
 without hitting external CDNs. The UI embraces a retro internet vibe and
- provides pages for signing in, choosing an Artist or regular User profile during registration, and browsing community profiles via the new `/browse` page which features tabs to switch between artists and users. You can also view your profile and edit it at `/profile/edit`. When signed in, your profile picture appears in the top-right corner of the navigation bar and links back to your profile. Your username is displayed beside the avatar so you know which account is active. A new "Customize" link in the navigation bar takes you directly to the editor so you can add custom HTML to style your profile, and view uploaded media. Placeholders for the upcoming
+ provides pages for signing in, choosing an Artist or regular User profile during registration, and browsing community profiles via the new `/browse` page which features tabs to switch between artists and users. You can also view your profile and edit it at `/profile/edit`. When signed in, your profile picture appears in the top-right corner of the navigation bar and links back to your profile. Your username is displayed beside the avatar so you know which account is active. Use the "Edit Profile" button on your profile page to update details, pick a color theme or add custom HTML for deeper customization. Placeholders for the upcoming
 show calendar and merch shop are also included.
 Swagger documentation is available at [http://localhost:3000/docs](http://localhost:3000/docs).
 Click a profile on the Browse page to view details at `/artists/:id` or `/users/:id`.
