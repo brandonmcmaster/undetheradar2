@@ -19,6 +19,7 @@ to:
 - Participate in a message board without algorithmic feeds
 - Post updates to a shared bulletin board
 - Follow other users and receive notifications for new activity
+- View posts, shows and merch from people you follow
 
 The backend is built with Node.js, Express and SQLite using CommonJS modules and
 minimal dependencies. Structured logs are produced with **Pino**. Current endpoints include:
@@ -177,18 +178,21 @@ user who uploaded each file.
 
 - `GET /shows` – list all shows
 - `GET /shows/user/:id` – shows for a specific artist
+- `GET /shows/feed` – shows from artists you follow (requires authentication)
 - `POST /shows` – create a new show (requires authentication)
 
 ### `/merch`
 
 - `GET /merch` – list all merch items
 - `GET /merch/user/:id` – merch for a specific user
+- `GET /merch/feed` – merch from users you follow (requires authentication)
 - `POST /merch` – create a merch item (requires authentication)
 
 ### `/board`
 
 - `GET /board` – list all board posts (each includes `updated_at` if edited)
 - `GET /board/user/:id` – posts by a specific user
+- `GET /board/feed` – posts from users you follow (requires authentication)
 - `POST /board` – create a new board post with `headline` and `content` (requires authentication)
 - `POST /board/:id/like` – like a post (requires authentication)
 - `POST /board/:id/dislike` – dislike a post (requires authentication)

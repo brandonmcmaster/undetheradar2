@@ -243,6 +243,9 @@
     "/shows/user/{id}": {
       "get": {"summary": "Shows for a user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Shows"}}}
     },
+    "/shows/feed": {
+      "get": {"summary": "Shows from followed artists", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Shows"}}}
+    },
     "/merch": {
       "get": {"summary": "List merch", "responses": {"200": {"description": "Items"}}},
       "post": {"summary": "Create merch", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["product_name", "price"], "properties": {"product_name": {"type": "string"}, "price": {"type": "number"}, "stock": {"type": "integer"}}}}}}, "responses": {"200": {"description": "Created"}}}
@@ -250,12 +253,18 @@
     "/merch/user/{id}": {
       "get": {"summary": "Merch for user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Items"}}}
     },
+    "/merch/feed": {
+      "get": {"summary": "Merch from followed users", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Items"}}}
+    },
     "/board": {
       "get": {"summary": "List board posts", "description": "Posts include `updated_at` when edited", "responses": {"200": {"description": "Posts"}}},
       "post": {"summary": "Create board post", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["headline", "content"], "properties": {"headline": {"type": "string"}, "content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
     },
     "/board/user/{id}": {
       "get": {"summary": "Posts by user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Posts"}}}
+    },
+    "/board/feed": {
+      "get": {"summary": "Posts from followed users", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts"}}}
     },
     "/board/{id}/like": {
       "post": {"summary": "Like a post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Success"}}}
