@@ -531,3 +531,18 @@ test('leaderboard tracks points', async () => {
   expect(fanData.fan_points).toBeGreaterThan(0);
   expect(fanData.artist_points).toBe(0);
 });
+
+test('returns 404 for missing user', async () => {
+  const res = await context.get('/users/9999');
+  expect(res.status()).toBe(404);
+});
+
+test('profile update returns 404 for missing user', async () => {
+  const jwt = require('jsonwebtoken');
+  const token = jwt.sign({ id: 9999, username: 'ghost' }, 'secret');
+  const res = await context.post('/users', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { name: 'Ghost' }
+  });
+  expect(res.status()).toBe(404);
+});
