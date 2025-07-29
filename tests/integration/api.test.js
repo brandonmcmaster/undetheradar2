@@ -467,3 +467,34 @@ test('feed endpoints return followed content', async () => {
   const merch = await (await context.get('/merch/feed', { headers: { Authorization: `Bearer ${ta}` } })).json();
   expect(merch.length).toBe(1);
 });
+
+test('leaderboard tracks points', async () => {
+  const fanRes = await context.post('/auth/register', {
+    data: { name: 'Fan', username: 'fanuser', password: 'pw' }
+  });
+  const { token: fanToken, id: fanId } = await fanRes.json();
+
+  const artRes = await context.post('/auth/register', {
+    data: { name: 'Artist', username: 'artuser', password: 'pw', is_artist: true }
+  });
+  const { token: artToken, id: artId } = await artRes.json();
+
+  await context.post('/board', {
+    headers: { Authorization: `Bearer ${fanToken}` },
+    data: { headline: 'Hi', content: 'there' }
+  });
+
+  await context.post('/board', {
+    headers: { Authorization: `Bearer ${artToken}` },
+    data: { headline: 'Art', content: 'post' }
+  });
+
+  const fans = await (await context.get('/leaderboard/fans')).json();
+  expect(fans.some(u => u.id === fanId)).toBeTruthy();
+  const artists = await (await context.get('/leaderboard/artists')).json();
+  expect(artists.some(u => u.id === artId)).toBeTruthy();
+
+  const fanData = await (await context.get(`/users/${fanId}`)).json();
+  expect(fanData.fan_points).toBeGreaterThan(0);
+  expect(fanData.artist_points).toBe(0);
+});

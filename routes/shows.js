@@ -4,6 +4,7 @@ const { db } = require('../db');
 const authenticate = require('../middleware/auth');
 const { body, param } = require('express-validator');
 const validate = require('../middleware/validate');
+const { addPoints } = require('../utils/gamify');
 
 // List all shows
 router.get('/', (req, res, next) => {
@@ -52,6 +53,7 @@ router.post(
       [req.user.id, venue, date, description],
       function (err) {
         if (err) return next(err);
+        addPoints(req.user.id, 5, true);
         res.json({ id: this.lastID });
       }
     );

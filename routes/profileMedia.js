@@ -8,6 +8,7 @@ const { db } = require('../db');
 const authenticate = require('../middleware/auth');
 const { param } = require('express-validator');
 const validate = require('../middleware/validate');
+const { addPoints, awardBadge } = require('../utils/gamify');
 
 const uploadDir = path.join(__dirname, '..', 'uploads');
 const allowedTypes = ['image/jpeg', 'image/png', 'video/mp4'];
@@ -75,6 +76,8 @@ router.post('/', authenticate, upload.single('file'), (req, res, next) => {
           [req.user.id, mediaId],
           function (err3) {
             if (err3) return next(err3);
+            addPoints(req.user.id, 5, req.user.is_artist);
+            awardBadge(req.user.id, 'Debut Release', req.user.is_artist);
             res.json({ id: this.lastID, media_id: mediaId });
           }
         );

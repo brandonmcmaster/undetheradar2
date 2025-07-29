@@ -5,6 +5,7 @@ const authenticate = require('../middleware/auth');
 const { body, param } = require('express-validator');
 const validate = require('../middleware/validate');
 const notify = require('../utils/notify');
+const { addPoints, awardBadge } = require('../utils/gamify');
 
 // List all board posts
 router.get('/', (req, res, next) => {
@@ -71,6 +72,8 @@ router.post(
       [req.user.id, headline, content],
       function (err) {
         if (err) return next(err);
+        addPoints(req.user.id, 5, req.user.is_artist);
+        awardBadge(req.user.id, 'First Post', req.user.is_artist);
         res.json({ id: this.lastID, user_id: req.user.id, headline, content });
       }
     );
@@ -137,6 +140,7 @@ router.post(
           notify(row.user_id, `User ${req.user.id} commented on your post`);
         }
       });
+      addPoints(req.user.id, 2, req.user.is_artist);
       res.json({ id: this.lastID, post_id: req.params.id, user_id: req.user.id, content });
     });
   }

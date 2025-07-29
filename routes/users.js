@@ -31,7 +31,7 @@ const upload = multer({
 // Get all users
 router.get('/', (req, res) => {
   let sql =
-    'SELECT id, name, username, email, bio, social, avatar_id, is_artist FROM users';
+    'SELECT id, name, username, email, bio, social, avatar_id, is_artist, fan_points, artist_points FROM users';
   const params = [];
   const { type, q, letter } = req.query;
   const conditions = [];
@@ -121,7 +121,7 @@ router.get(
   validate,
   (req, res, next) => {
     db.get(
-      'SELECT id, name, username, email, bio, social, avatar_id, is_artist FROM users WHERE id = ?',
+      'SELECT id, name, username, email, bio, social, avatar_id, is_artist, fan_points, artist_points FROM users WHERE id = ?',
       [req.params.id],
       (err, row) => {
         if (err) return next(err);
