@@ -21,6 +21,7 @@ const merchRouter = require('./routes/merch');
 const boardRouter = require('./routes/board');
 const followRouter = require('./routes/follow');
 const notificationsRouter = require('./routes/notifications');
+const leaderboardRouter = require('./routes/leaderboard');
 const errorHandler = require('./middleware/error');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require('./openapi.json');
@@ -68,6 +69,7 @@ app.use('/merch', merchRouter);
 app.use('/board', boardRouter);
 app.use('/follow', followRouter);
 app.use('/notifications', notificationsRouter);
+app.use('/leaderboard', leaderboardRouter);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 app.get('/health', (req, res) => {

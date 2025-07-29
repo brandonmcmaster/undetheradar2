@@ -215,6 +215,11 @@ user who uploaded each file.
 - `POST /notifications/:id/read` – mark a notification as read
 - `GET /notifications/unread_count` – get count of unread notifications
 
+### `/leaderboard`
+
+- `GET /leaderboard/fans` – top fans sorted by points
+- `GET /leaderboard/artists` – top artists sorted by points
+
 ### Misc
 
 - `GET /health` – simple health check returning `{ "status": "ok" }`

@@ -295,6 +295,12 @@
       "post": {"summary": "Follow user", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Followed"}}},
       "delete": {"summary": "Unfollow user", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Unfollowed"}}}
     },
+    "/leaderboard/fans": {
+      "get": {"summary": "Top fans", "responses": {"200": {"description": "Fans"}}}
+    },
+    "/leaderboard/artists": {
+      "get": {"summary": "Top artists", "responses": {"200": {"description": "Artists"}}}
+    },
     "/notifications": {
       "get": {"summary": "List notifications", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Notifications"}}}
     },
