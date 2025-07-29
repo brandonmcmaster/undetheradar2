@@ -335,6 +335,22 @@ test('profile custom HTML is sanitized and stored', async () => {
   expect(data.custom_html).toBe('<b>hi</b>');
 });
 
+test('updating only theme keeps existing fields', async () => {
+  const reg = await context.post('/auth/register', {
+    data: { name: 'Theme', username: 'themeuser', password: 'pw' }
+  });
+  const { token, id } = await reg.json();
+  const update = await context.post('/users', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { profile_theme: 'dark' }
+  });
+  expect(update.ok()).toBeTruthy();
+  const user = await context.get(`/users/${id}`);
+  const data = await user.json();
+  expect(data.name).toBe('Theme');
+  expect(data.profile_theme).toBe('dark');
+});
+
 test('user type filtering works', async () => {
   await context.post('/auth/register', {
     data: { name: 'Artist', username: 'artist', password: 'pw', is_artist: true }
