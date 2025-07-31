@@ -198,7 +198,7 @@ function Profile({ auth }) {
     fetch(`/users/${auth.userId}`)
       .then(r => r.json())
       .then(setProfile);
-  }, [auth]);
+  }, [auth.token, auth.userId]);
 
   const uploadAvatar = () => {
     if (!avatarFile) return;
@@ -268,7 +268,7 @@ function EditProfile({ auth }) {
         setCustomHtml(u.custom_html || '');
         setTheme(u.profile_theme || 'default');
       });
-  }, [auth]);
+  }, [auth.token, auth.userId]);
 
   const save = () => {
     fetch('/users', {
