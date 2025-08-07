@@ -104,11 +104,14 @@ function Nav({ auth, unread }) {
 
 function Home() {
   return (
-    <div className="p-4 space-y-2">
-      <div className="text-xl font-bold">Under the Radar</div>
-      <p>A home for underground musicians to share their art without algorithms.</p>
-      <p>Create a profile, upload your tracks and photos, list shows and sell merch directly to fans.</p>
-    </div>
+    <section className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-20 hero-section">
+      <h1 className="text-4xl font-bold mb-4 hero-title">Under the Radar</h1>
+      <p className="text-lg mb-2">A home for underground musicians to share their art without algorithms.</p>
+      <p className="mb-6">Create a profile, upload your tracks and photos, list shows and sell merch directly to fans.</p>
+      <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/signin">
+        Get Started
+      </Link>
+    </section>
   );
 }
 

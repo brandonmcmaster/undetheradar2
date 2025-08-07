@@ -19,3 +19,11 @@ body {
   background-color: #e0f7fa;
   color: #014751;
 }
+
+.hero-section {
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.15), transparent 70%);
+}
+
+.hero-title {
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
