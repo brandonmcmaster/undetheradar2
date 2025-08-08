@@ -4,7 +4,7 @@ const dbFile = process.env.DB_FILE || path.join(__dirname, 'app.db');
 const db = new sqlite3.Database(dbFile);
 
 // Initialize tables
-const init = () => {
+const init = (options = {}) => {
   db.serialize(() => {
     db.run('PRAGMA foreign_keys = ON');
 
@@ -240,12 +240,14 @@ const init = () => {
       }
     });
 
-    db.get('SELECT COUNT(*) AS c FROM users', (err, row) => {
-      if (!err && row.c === 0) {
-        const seed = require('./seed');
-        seed(db);
-      }
-    });
+    if (options.seedDemo !== false) {
+      db.get('SELECT COUNT(*) AS c FROM users', (err, row) => {
+        if (!err && row.c === 0) {
+          const seed = require('./seed');
+          seed(db);
+        }
+      });
+    }
   });
 };
 

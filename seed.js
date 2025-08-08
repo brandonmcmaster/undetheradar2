@@ -47,7 +47,7 @@ module.exports = seed;
 
 if (require.main === module) {
   const { db, init } = require('./db');
-  init();
+  init({ seedDemo: false });
   seed(db);
   db.close();
 }
