@@ -57,6 +57,12 @@ Start the server:
 npm start
 ```
 
+Seed demo data manually:
+
+```bash
+npm run seed
+```
+
 Environment variables are loaded from a `.env` file. Set `PORT`, `DB_FILE` and
 `JWT_SECRET` as needed. Optional values include `CORS_ORIGIN` and rate limit
 settings. The server listens on port `3000` if `PORT` is not specified.

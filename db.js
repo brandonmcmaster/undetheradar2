@@ -239,6 +239,13 @@ const init = () => {
         db.run("INSERT INTO artist_badges(badge_name, description) VALUES('Debut Release','Uploaded first media')");
       }
     });
+
+    db.get('SELECT COUNT(*) AS c FROM users', (err, row) => {
+      if (!err && row.c === 0) {
+        const seed = require('./seed');
+        seed(db);
+      }
+    });
   });
 };
 
