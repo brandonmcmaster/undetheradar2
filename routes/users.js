@@ -73,9 +73,12 @@ router.post(
     const { name, email, bio, social, custom_html, profile_theme } = req.body;
     const safeHtml = custom_html
       ? sanitizeHtml(custom_html, {
-          allowedTags: false,
-          allowedAttributes: { '*': ['id', 'class', 'style', 'href', 'src'] },
-          exclusiveFilter: f => f.tag === 'script' || f.tag === 'style'
+          allowedTags: sanitizeHtml.defaults.allowedTags,
+          allowedAttributes: {
+            '*': ['id', 'class', 'style'],
+            a: ['href'],
+            img: ['src']
+          }
         })
       : undefined;
     db.get(
