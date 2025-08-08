@@ -7,7 +7,7 @@ const validate = require('../middleware/validate');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const sanitizeHtml = require('sanitize-html');
 
 const uploadDir = path.join(__dirname, '..', 'uploads');
@@ -124,7 +124,7 @@ router.post('/avatar', authenticate, upload.single('avatar'), (req, res, next) =
     return next(errFile);
   }
   const filePath = path.join(uploadDir, req.file.filename);
-  exec(`clamscan ${filePath}`, (err, stdout) => {
+  execFile('clamscan', [filePath], (err, stdout) => {
     if (err && err.code === 127) {
       // clamscan not installed, skip scanning
     } else if (err && err.code !== 1 && err.code !== 2) {

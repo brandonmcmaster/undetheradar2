@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const { db } = require('../db');
 const authenticate = require('../middleware/auth');
 const { param } = require('express-validator');
@@ -51,7 +51,7 @@ router.post('/', authenticate, upload.single('file'), (req, res, next) => {
 
   const filePath = path.join(uploadDir, req.file.filename);
   // Virus scan using clamscan if available
-  exec(`clamscan ${filePath}`, (err, stdout) => {
+  execFile('clamscan', [filePath], (err, stdout) => {
     if (err && err.code === 127) {
       // clamscan not installed, skip scanning
     } else if (err && err.code !== 1 && err.code !== 2) {
