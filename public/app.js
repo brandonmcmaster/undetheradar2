@@ -102,16 +102,44 @@ function Nav({ auth, unread }) {
   );
 }
 
+function TrendingPosts() {
+  const [posts, setPosts] = React.useState([]);
+  React.useEffect(() => {
+    fetch('/board')
+      .then(r => r.json())
+      .then(d => {
+        const top = d.sort((a, b) => b.likes - a.likes).slice(0, 3);
+        setPosts(top);
+      });
+  }, []);
+  return (
+    <div className="max-w-3xl mx-auto mt-8 space-y-4">
+      {posts.map(p => (
+        <div key={p.id} className="bg-white shadow p-4">
+          <h3 className="font-bold">{p.headline}</h3>
+          <p className="text-sm">
+            {p.content.slice(0, 100)}{p.content.length > 100 ? '...' : ''}
+          </p>
+          <div className="text-xs text-gray-600 mt-2">{p.likes} likes</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Home() {
   return (
-    <section className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-20 hero-section">
-      <h1 className="text-4xl font-bold mb-4 hero-title">Under the Radar</h1>
-      <p className="text-lg mb-2">A home for underground musicians to share their art without algorithms.</p>
-      <p className="mb-6">Create a profile, upload your tracks and photos, list shows and sell merch directly to fans.</p>
-      <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/signin">
-        Get Started
-      </Link>
-    </section>
+    <React.Fragment>
+      <section className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-20 hero-section">
+        <h1 className="text-4xl font-bold mb-4 hero-title">Under the Radar</h1>
+        <p className="text-lg mb-2">A home for underground musicians to share their art without algorithms.</p>
+        <p className="mb-6">Create a profile, upload your tracks and photos, list shows and sell merch directly to fans.</p>
+        <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/signin">
+          Get Started
+        </Link>
+      </section>
+      <TrendingPosts />
+    </React.Fragment>
   );
 }
 
