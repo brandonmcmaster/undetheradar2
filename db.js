@@ -4,7 +4,7 @@ const dbFile = process.env.DB_FILE || path.join(__dirname, 'app.db');
 const db = new sqlite3.Database(dbFile);
 
 // Initialize tables
-const init = () => {
+const init = (options = {}) => {
   db.serialize(() => {
     db.run('PRAGMA foreign_keys = ON');
 
@@ -162,60 +162,29 @@ const init = () => {
       FOREIGN KEY(badge_id) REFERENCES artist_badges(id) ON DELETE CASCADE ON UPDATE CASCADE
     )`);
 
-    // Ensure media table has all columns when upgrading from older versions
-    db.all('PRAGMA table_info(media)', [], (err, cols) => {
-      if (err) return;
-      const names = cols.map(c => c.name);
-      const add = (name, type) => {
-        if (!names.includes(name)) db.run(`ALTER TABLE media ADD COLUMN ${name} ${type}`);
-      };
-      add('original_name', 'TEXT');
-      add('mime_type', 'TEXT');
-      add('size', 'INTEGER');
-      add('user_id', 'INTEGER');
-    });
+    // Ensure tables have required columns, ignoring errors if they already exist
+    const safeAddColumn = (table, column, def) => {
+      db.run(`ALTER TABLE ${table} ADD COLUMN ${column} ${def}`, err => {
+        if (err && !/duplicate column/.test(err.message)) console.error(err);
+      });
+    };
 
-    // Ensure users table has avatar_id and is_artist columns
-    db.all('PRAGMA table_info(users)', [], (err, cols) => {
-      if (err) return;
-      const names = cols.map(c => c.name);
-      if (!names.includes('avatar_id')) {
-        db.run('ALTER TABLE users ADD COLUMN avatar_id INTEGER');
-      }
-      if (!names.includes('is_artist')) {
-        db.run('ALTER TABLE users ADD COLUMN is_artist INTEGER DEFAULT 0');
-      }
-      if (!names.includes('custom_html')) {
-        db.run('ALTER TABLE users ADD COLUMN custom_html TEXT');
-      }
-      if (!names.includes('profile_theme')) {
-        db.run('ALTER TABLE users ADD COLUMN profile_theme TEXT');
-      }
-      if (!names.includes('fan_points')) {
-        db.run('ALTER TABLE users ADD COLUMN fan_points INTEGER DEFAULT 0');
-      }
-      if (!names.includes('artist_points')) {
-        db.run('ALTER TABLE users ADD COLUMN artist_points INTEGER DEFAULT 0');
-      }
-      if (!names.includes('fan_level_id')) {
-        db.run('ALTER TABLE users ADD COLUMN fan_level_id INTEGER');
-      }
-      if (!names.includes('artist_level_id')) {
-        db.run('ALTER TABLE users ADD COLUMN artist_level_id INTEGER');
-      }
-    });
+    safeAddColumn('media', 'original_name', 'TEXT');
+    safeAddColumn('media', 'mime_type', 'TEXT');
+    safeAddColumn('media', 'size', 'INTEGER');
+    safeAddColumn('media', 'user_id', 'INTEGER');
 
-    // Ensure board_posts has updated_at and headline columns
-    db.all('PRAGMA table_info(board_posts)', [], (err, cols) => {
-      if (err) return;
-      const names = cols.map(c => c.name);
-      if (!names.includes('updated_at')) {
-        db.run('ALTER TABLE board_posts ADD COLUMN updated_at DATETIME');
-      }
-      if (!names.includes('headline')) {
-        db.run("ALTER TABLE board_posts ADD COLUMN headline TEXT DEFAULT ''");
-      }
-    });
+    safeAddColumn('users', 'avatar_id', 'INTEGER');
+    safeAddColumn('users', 'is_artist', 'INTEGER DEFAULT 0');
+    safeAddColumn('users', 'custom_html', 'TEXT');
+    safeAddColumn('users', 'profile_theme', 'TEXT');
+    safeAddColumn('users', 'fan_points', 'INTEGER DEFAULT 0');
+    safeAddColumn('users', 'artist_points', 'INTEGER DEFAULT 0');
+    safeAddColumn('users', 'fan_level_id', 'INTEGER');
+    safeAddColumn('users', 'artist_level_id', 'INTEGER');
+
+    safeAddColumn('board_posts', 'updated_at', 'DATETIME');
+    safeAddColumn('board_posts', 'headline', "TEXT DEFAULT ''");
 
     // Seed level tables with defaults if empty
     db.get('SELECT COUNT(*) AS c FROM fan_levels', (err, row) => {
@@ -239,6 +208,15 @@ const init = () => {
         db.run("INSERT INTO artist_badges(badge_name, description) VALUES('Debut Release','Uploaded first media')");
       }
     });
+
+    if (options.seedDemo !== false && dbFile !== ':memory:') {
+      db.get('SELECT COUNT(*) AS c FROM users', (err, row) => {
+        if (!err && row.c === 0) {
+          const seed = require('./seed');
+          seed(db);
+        }
+      });
+    }
   });
 };
 
