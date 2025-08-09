@@ -22,15 +22,20 @@ router.post(
   (req, res, next) => {
     const { name, username, password, email, bio, social, is_artist } = req.body;
     const hashed = bcrypt.hashSync(password, 10);
+    const artist = is_artist ? 1 : 0;
     const stmt =
       'INSERT INTO users(name, username, password, email, bio, social, is_artist) VALUES(?,?,?,?,?,?,?)';
     db.run(
       stmt,
-      [name, username, hashed, email, bio, social, is_artist ? 1 : 0],
+      [name, username, hashed, email, bio, social, artist],
       function (err) {
         if (err) return next(err);
-        const token = jwt.sign({ id: this.lastID, username }, SECRET);
-        res.json({ token, id: this.lastID });
+        const isArtist = !!artist;
+        const token = jwt.sign(
+          { id: this.lastID, username, is_artist: isArtist },
+          SECRET
+        );
+        res.json({ token, id: this.lastID, is_artist: isArtist });
       }
     );
   }
@@ -50,8 +55,12 @@ router.post(
       if (!bcrypt.compareSync(password, user.password)) {
         return next(new Error('Invalid credentials'));
       }
-      const token = jwt.sign({ id: user.id, username: user.username }, SECRET);
-      res.json({ token, id: user.id });
+      const isArtist = !!user.is_artist;
+      const token = jwt.sign(
+        { id: user.id, username: user.username, is_artist: isArtist },
+        SECRET
+      );
+      res.json({ token, id: user.id, is_artist: isArtist });
     });
   }
 );
