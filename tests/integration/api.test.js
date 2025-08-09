@@ -5,6 +5,14 @@ let server;
 let context;
 let baseURL;
 
+async function register(data) {
+  const res = await context.post('/auth/register', { data });
+  expect(res.ok()).toBeTruthy();
+  const body = await res.json();
+  expect(body.is_artist).toBe(Boolean(data.is_artist));
+  return body;
+}
+
 // start server with in-memory DB
 
 test.beforeAll(async () => {
@@ -31,12 +39,13 @@ test.afterAll(async () => {
 });
 
 test('registration and login', async () => {
-  const res = await context.post('/auth/register', {
-    data: { name: 'Alice', username: 'alice', password: 'pass' }
+  const { token, is_artist } = await register({
+    name: 'Alice',
+    username: 'alice',
+    password: 'pass'
   });
-  expect(res.ok()).toBeTruthy();
-  const { token } = await res.json();
   expect(token).toBeTruthy();
+  expect(is_artist).toBe(false);
 
   const login = await context.post('/auth/login', {
     data: { username: 'alice', password: 'pass' }
@@ -44,19 +53,22 @@ test('registration and login', async () => {
   expect(login.ok()).toBeTruthy();
   const body = await login.json();
   expect(body.token).toBeTruthy();
+  expect(body.is_artist).toBe(false);
 });
 
 test('messaging and media upload', async () => {
   // create two users
-  const u1 = await context.post('/auth/register', {
-    data: { name: 'Bob', username: 'bob', password: 'pw' }
+  const { token: t1 } = await register({
+    name: 'Bob',
+    username: 'bob',
+    password: 'pw'
   });
-  const { token: t1 } = await u1.json();
 
-  const u2 = await context.post('/auth/register', {
-    data: { name: 'Carol', username: 'carol', password: 'pw' }
+  const { token: t2, id: id2 } = await register({
+    name: 'Carol',
+    username: 'carol',
+    password: 'pw'
   });
-  const { token: t2, id: id2 } = await u2.json();
 
   // send message from Bob to Carol
   const msg = await context.post('/messages', {
@@ -87,10 +99,11 @@ test('messaging and media upload', async () => {
 });
 
 test('board post creation', async () => {
-  const reg = await context.post('/auth/register', {
-    data: { name: 'Dana', username: 'dana', password: 'pw' }
+  const { token } = await register({
+    name: 'Dana',
+    username: 'dana',
+    password: 'pw'
   });
-  const { token } = await reg.json();
   const post = await context.post('/board', {
     headers: { Authorization: `Bearer ${token}` },
     data: { headline: 'Test', content: 'Hello board' }
@@ -103,14 +116,16 @@ test('board post creation', async () => {
 });
 
 test('board post interactions', async () => {
-  const u1 = await context.post('/auth/register', {
-    data: { name: 'Ed', username: 'ed', password: 'pw' }
+  const { token: t1 } = await register({
+    name: 'Ed',
+    username: 'ed',
+    password: 'pw'
   });
-  const { token: t1 } = await u1.json();
-  const u2 = await context.post('/auth/register', {
-    data: { name: 'Fay', username: 'fay', password: 'pw' }
+  const { token: t2 } = await register({
+    name: 'Fay',
+    username: 'fay',
+    password: 'pw'
   });
-  const { token: t2 } = await u2.json();
 
   const created = await context.post('/board', {
     headers: { Authorization: `Bearer ${t1}` },
@@ -140,10 +155,11 @@ test('board post interactions', async () => {
 });
 
 test('board post editing', async () => {
-  const reg = await context.post('/auth/register', {
-    data: { name: 'Mia', username: 'mia', password: 'pw' }
+  const { token } = await register({
+    name: 'Mia',
+    username: 'mia',
+    password: 'pw'
   });
-  const { token } = await reg.json();
   const created = await context.post('/board', {
     headers: { Authorization: `Bearer ${token}` },
     data: { headline: 'Orig', content: 'Original' }
@@ -163,14 +179,16 @@ test('board post editing', async () => {
 });
 
 test('comment editing and post deletion', async () => {
-  const u1 = await context.post('/auth/register', {
-    data: { name: 'Ken', username: 'ken', password: 'pw' }
+  const { token: t1 } = await register({
+    name: 'Ken',
+    username: 'ken',
+    password: 'pw'
   });
-  const { token: t1 } = await u1.json();
-  const u2 = await context.post('/auth/register', {
-    data: { name: 'Liz', username: 'liz', password: 'pw' }
+  const { token: t2 } = await register({
+    name: 'Liz',
+    username: 'liz',
+    password: 'pw'
   });
-  const { token: t2 } = await u2.json();
 
   const created = await context.post('/board', {
     headers: { Authorization: `Bearer ${t1}` },
@@ -217,10 +235,11 @@ test('health check works', async () => {
 });
 
 test('shows endpoints work', async () => {
-  const reg = await context.post('/auth/register', {
-    data: { name: 'Greg', username: 'greg', password: 'pw' }
+  const { token, id } = await register({
+    name: 'Greg',
+    username: 'greg',
+    password: 'pw'
   });
-  const { token, id } = await reg.json();
 
   const create = await context.post('/shows', {
     headers: { Authorization: `Bearer ${token}` },
@@ -241,10 +260,11 @@ test('shows endpoints work', async () => {
 });
 
 test('merch endpoints work', async () => {
-  const reg = await context.post('/auth/register', {
-    data: { name: 'Hank', username: 'hank', password: 'pw' }
+  const { token, id } = await register({
+    name: 'Hank',
+    username: 'hank',
+    password: 'pw'
   });
-  const { token, id } = await reg.json();
 
   const create = await context.post('/merch', {
     headers: { Authorization: `Bearer ${token}` },
@@ -265,10 +285,11 @@ test('merch endpoints work', async () => {
 });
 
 test('avatar upload works', async () => {
-  const reg = await context.post('/auth/register', {
-    data: { name: 'Ian', username: 'ian', password: 'pw' }
+  const { token, id } = await register({
+    name: 'Ian',
+    username: 'ian',
+    password: 'pw'
   });
-  const { token, id } = await reg.json();
   const fs = require('fs');
   const path = require('path');
   const tmp = path.join(__dirname, 'avatar.png');
@@ -287,10 +308,11 @@ test('avatar upload works', async () => {
 });
 
 test('profile media upload and listing works', async () => {
-  const reg = await context.post('/auth/register', {
-    data: { name: 'Jo', username: 'jo', password: 'pw' }
+  const { token, id } = await register({
+    name: 'Jo',
+    username: 'jo',
+    password: 'pw'
   });
-  const { token, id } = await reg.json();
   const fs = require('fs');
   const path = require('path');
   const tmp = path.join(__dirname, 'post.png');
@@ -319,10 +341,11 @@ test('metrics endpoint responds', async () => {
 });
 
 test('profile custom HTML is sanitized and stored', async () => {
-  const reg = await context.post('/auth/register', {
-    data: { name: 'HTML', username: 'htmluser', password: 'pw' }
+  const { token, id } = await register({
+    name: 'HTML',
+    username: 'htmluser',
+    password: 'pw'
   });
-  const { token, id } = await reg.json();
 
   const html = '<script>alert(1)</script><b>hi</b>';
   const update = await context.post('/users', {
@@ -336,10 +359,11 @@ test('profile custom HTML is sanitized and stored', async () => {
 });
 
 test('updating only theme keeps existing fields', async () => {
-  const reg = await context.post('/auth/register', {
-    data: { name: 'Theme', username: 'themeuser', password: 'pw' }
+  const { token, id } = await register({
+    name: 'Theme',
+    username: 'themeuser',
+    password: 'pw'
   });
-  const { token, id } = await reg.json();
   const update = await context.post('/users', {
     headers: { Authorization: `Bearer ${token}` },
     data: { profile_theme: 'dark' }
@@ -352,11 +376,17 @@ test('updating only theme keeps existing fields', async () => {
 });
 
 test('user type filtering works', async () => {
-  await context.post('/auth/register', {
-    data: { name: 'Artist', username: 'artist', password: 'pw', is_artist: true }
+  await register({
+    name: 'Artist',
+    username: 'artist',
+    password: 'pw',
+    is_artist: true
   });
-  await context.post('/auth/register', {
-    data: { name: 'Regular', username: 'regular', password: 'pw', is_artist: false }
+  await register({
+    name: 'Regular',
+    username: 'regular',
+    password: 'pw',
+    is_artist: false
   });
   const arts = await context.get('/users?type=artist');
   const artList = await arts.json();
@@ -367,14 +397,23 @@ test('user type filtering works', async () => {
 });
 
 test('user search works', async () => {
-  await context.post('/auth/register', {
-    data: { name: 'Alice', username: 'alice123', password: 'pw', is_artist: true }
+  await register({
+    name: 'Alice',
+    username: 'alice123',
+    password: 'pw',
+    is_artist: true
   });
-  await context.post('/auth/register', {
-    data: { name: 'Bob', username: 'bobby', password: 'pw', is_artist: false }
+  await register({
+    name: 'Bob',
+    username: 'bobby',
+    password: 'pw',
+    is_artist: false
   });
-  await context.post('/auth/register', {
-    data: { name: 'Charlie', username: 'charlie', password: 'pw', is_artist: true }
+  await register({
+    name: 'Charlie',
+    username: 'charlie',
+    password: 'pw',
+    is_artist: true
   });
 
   const search = await context.get('/users?q=obb');
@@ -389,14 +428,16 @@ test('user search works', async () => {
 });
 
 test('follow and notifications work', async () => {
-  const u1 = await context.post('/auth/register', {
-    data: { name: 'A', username: 'aa', password: 'pw' }
+  const { token: t1, id: id1 } = await register({
+    name: 'A',
+    username: 'aa',
+    password: 'pw'
   });
-  const { token: t1, id: id1 } = await u1.json();
-  const u2 = await context.post('/auth/register', {
-    data: { name: 'B', username: 'bb', password: 'pw' }
+  const { token: t2, id: id2 } = await register({
+    name: 'B',
+    username: 'bb',
+    password: 'pw'
   });
-  const { token: t2, id: id2 } = await u2.json();
 
   const follow = await context.post(`/follow/${id2}`, {
     headers: { Authorization: `Bearer ${t1}` }
@@ -421,14 +462,16 @@ test('follow and notifications work', async () => {
 });
 
 test('notifications unread count works', async () => {
-  const u1 = await context.post('/auth/register', {
-    data: { name: 'C', username: 'cc', password: 'pw' }
+  const { token: t1 } = await register({
+    name: 'C',
+    username: 'cc',
+    password: 'pw'
   });
-  const { token: t1 } = await u1.json();
-  const u2 = await context.post('/auth/register', {
-    data: { name: 'D', username: 'dd', password: 'pw' }
+  const { token: t2, id: id2 } = await register({
+    name: 'D',
+    username: 'dd',
+    password: 'pw'
   });
-  const { token: t2, id: id2 } = await u2.json();
 
   await context.post(`/follow/${id2}`, {
     headers: { Authorization: `Bearer ${t1}` }
@@ -456,15 +499,17 @@ test('notifications unread count works', async () => {
 });
 
 test('feed endpoints return followed content', async () => {
-  const a = await context.post('/auth/register', {
-    data: { name: 'FeedA', username: 'feeda', password: 'pw' }
+  const { token: ta } = await register({
+    name: 'FeedA',
+    username: 'feeda',
+    password: 'pw'
   });
-  const { token: ta } = await a.json();
 
-  const b = await context.post('/auth/register', {
-    data: { name: 'FeedB', username: 'feedb', password: 'pw' }
+  const { token: tb, id: idB } = await register({
+    name: 'FeedB',
+    username: 'feedb',
+    password: 'pw'
   });
-  const { token: tb, id: idB } = await b.json();
 
   await context.post('/board', {
     headers: { Authorization: `Bearer ${tb}` },
@@ -502,15 +547,18 @@ test('feed endpoints return followed content', async () => {
 });
 
 test('leaderboard tracks points', async () => {
-  const fanRes = await context.post('/auth/register', {
-    data: { name: 'Fan', username: 'fanuser', password: 'pw' }
+  const { token: fanToken, id: fanId } = await register({
+    name: 'Fan',
+    username: 'fanuser',
+    password: 'pw'
   });
-  const { token: fanToken, id: fanId } = await fanRes.json();
 
-  const artRes = await context.post('/auth/register', {
-    data: { name: 'Artist', username: 'artuser', password: 'pw', is_artist: true }
+  const { token: artToken, id: artId } = await register({
+    name: 'Artist',
+    username: 'artuser',
+    password: 'pw',
+    is_artist: true
   });
-  const { token: artToken, id: artId } = await artRes.json();
 
   await context.post('/board', {
     headers: { Authorization: `Bearer ${fanToken}` },

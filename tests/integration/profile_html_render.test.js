@@ -9,6 +9,14 @@ let page;
 let skip = false;
 let baseURL;
 
+async function register(data) {
+  const res = await api.post('/auth/register', { data });
+  expect(res.ok()).toBeTruthy();
+  const body = await res.json();
+  expect(body.is_artist).toBe(Boolean(data.is_artist));
+  return body;
+}
+
 test.beforeAll(async () => {
   process.env.DB_FILE = ':memory:';
   const fs = require('fs');
@@ -41,10 +49,11 @@ test.afterAll(async () => {
 
 test('custom HTML renders on profile', async ({}, testInfo) => {
   testInfo.skip(skip, 'browser not available');
-  const reg = await api.post('/auth/register', {
-    data: { name: 'UI', username: 'uiuser', password: 'pw' }
+  const { token, id } = await register({
+    name: 'UI',
+    username: 'uiuser',
+    password: 'pw'
   });
-  const { token, id } = await reg.json();
   const html = '<script>bad()</script><div id="cust"><b>Hello</b></div>';
   await api.post('/users', {
     headers: { Authorization: `Bearer ${token}` },
