@@ -48,7 +48,7 @@ const follows = [
   // Add more follows here
 ];
 
-const seed = dbInstance => {
+const seed = (dbInstance, done) => {
   dbInstance.serialize(() => {
     dbInstance.run('PRAGMA foreign_keys = OFF');
     dbInstance.run('DELETE FROM board_comments');
@@ -64,6 +64,7 @@ const seed = dbInstance => {
     dbInstance.run('DELETE FROM user_fan_badges');
     dbInstance.run('DELETE FROM user_artist_badges');
     dbInstance.run('DELETE FROM users');
+    dbInstance.run("DELETE FROM sqlite_sequence WHERE name IN ('users','follows','board_posts','board_reactions','board_comments')");
     dbInstance.run('PRAGMA foreign_keys = ON');
 
     users.forEach(u => {
@@ -101,6 +102,8 @@ const seed = dbInstance => {
         [c.user_id, c.post_id, c.content]
       );
     });
+
+    if (done) dbInstance.run('SELECT 1', done);
   });
 };
 
@@ -109,7 +112,6 @@ module.exports = seed;
 if (require.main === module) {
   const { db, init } = require('./db');
   init({ seedDemo: false });
-  seed(db);
-  db.close();
+  seed(db, () => db.close());
 }
 
