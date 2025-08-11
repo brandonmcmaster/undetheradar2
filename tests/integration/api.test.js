@@ -100,7 +100,7 @@ test('messaging and media upload', async () => {
 });
 
 test('board post creation', async () => {
-  const { token } = await register({
+  const { token, id } = await register({
     name: 'Dana',
     username: 'dana',
     password: 'pw'
@@ -110,14 +110,14 @@ test('board post creation', async () => {
     data: { headline: 'Test', content: 'Hello board' }
   });
   expect(post.ok()).toBeTruthy();
-  const all = await context.get('/board');
+  const all = await context.get(`/board/user/${id}`);
   expect(all.ok()).toBeTruthy();
   const items = await all.json();
   expect(items.find(p => p.headline === 'Test' && p.content === 'Hello board')).toBeTruthy();
 });
 
 test('board post interactions', async () => {
-  const { token: t1 } = await register({
+  const { token: t1, id: id1 } = await register({
     name: 'Ed',
     username: 'ed',
     password: 'pw'
@@ -145,7 +145,7 @@ test('board post interactions', async () => {
   });
   expect(comment.ok()).toBeTruthy();
 
-  const posts = await context.get('/board');
+  const posts = await context.get(`/board/user/${id1}`);
   const arr = await posts.json();
   const p = arr.find(x => x.id === id);
   expect(p.likes).toBe(1);
@@ -156,7 +156,7 @@ test('board post interactions', async () => {
 });
 
 test('board post editing', async () => {
-  const { token } = await register({
+  const { token, id: userId } = await register({
     name: 'Mia',
     username: 'mia',
     password: 'pw'
@@ -171,7 +171,7 @@ test('board post editing', async () => {
     data: { headline: 'Changed', content: 'Edited' }
   });
   expect(edit.ok()).toBeTruthy();
-  const posts = await context.get('/board');
+  const posts = await context.get(`/board/user/${userId}`);
   const arr = await posts.json();
   const updated = arr.find(p => p.id === id);
   expect(updated.headline).toBe('Changed');
@@ -180,7 +180,7 @@ test('board post editing', async () => {
 });
 
 test('comment editing and post deletion', async () => {
-  const { token: t1 } = await register({
+  const { token: t1, id: id1 } = await register({
     name: 'Ken',
     username: 'ken',
     password: 'pw'
@@ -223,7 +223,7 @@ test('comment editing and post deletion', async () => {
     headers: { Authorization: `Bearer ${t1}` }
   });
   expect(del.ok()).toBeTruthy();
-  const posts = await context.get('/board');
+  const posts = await context.get(`/board/user/${id1}`);
   const after = await posts.json();
   expect(after.find(p => p.id === id)).toBeUndefined();
 });

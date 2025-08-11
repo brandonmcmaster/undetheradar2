@@ -199,7 +199,6 @@ user who uploaded each file.
 
 ### `/board`
 
-- `GET /board` – list all board posts (each includes `updated_at` if edited)
 - `GET /board/user/:id` – posts by a specific user
 - `GET /board/feed` – posts from users you follow (requires authentication)
 - `GET /board/feed/artists` – posts from followed artists (requires authentication)
