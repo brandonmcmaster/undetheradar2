@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-// Template data arrays; modify or extend as needed
+// Template data arrays; extended for demo seeding
 const users = [
   {
     id: 1,
@@ -26,29 +26,72 @@ const users = [
     password: 'password123',
     is_artist: 0
   }
-  // Add more users here
 ];
+
+// Add additional users up to 100 total
+for (let i = 4; i <= 100; i++) {
+  users.push({
+    id: i,
+    name: `User ${i}`,
+    username: `user${i}`,
+    email: `user${i}@example.com`,
+    password: 'password123',
+    is_artist: i % 10 === 0 ? 1 : 0
+  });
+}
 
 const posts = [
   { user_id: 1, headline: 'Welcome', content: 'Welcome to the board' },
   { user_id: 2, headline: 'Another Post', content: 'Hello from Demo Artist' }
-  // Add more posts here
 ];
+
+// Add additional posts up to 40 total
+for (let i = 3; i <= 40; i++) {
+  const userId = ((i - 1) % users.length) + 1;
+  posts.push({
+    user_id: userId,
+    headline: `Post ${i}`,
+    content: `Content for post ${i}`
+  });
+}
 
 const reactions = [
   { user_id: 1, post_id: 2, reaction: 1 }
-  // Add more reactions here (reaction: 1 for like, -1 for dislike)
 ];
+
+// Add multiple likes across users for each post
+for (let i = 1; i <= 40; i++) {
+  for (let j = 0; j < 5; j++) {
+    const userId = ((i * 5 + j) % users.length) + 1;
+    // Skip existing reaction pair
+    if (!(i === 2 && userId === 1)) {
+      reactions.push({ user_id: userId, post_id: i, reaction: 1 });
+    }
+  }
+}
 
 const comments = [
   { user_id: 2, post_id: 1, content: 'Nice post!' }
-  // Add more comments here
 ];
+
+// Add comments for each post
+for (let i = 1; i <= 40; i++) {
+  for (let j = 0; j < 2; j++) {
+    const userId = ((i * 2 + j) % users.length) + 1;
+    // Skip existing comment pair
+    if (!(i === 1 && userId === 2)) {
+      comments.push({
+        user_id: userId,
+        post_id: i,
+        content: `Comment ${j + 1} on post ${i}`
+      });
+    }
+  }
+}
 
 const follows = [
   { follower_id: 1, followed_id: 2 },
   { follower_id: 2, followed_id: 1 }
-  // Add more follows here
 ];
 
 const seed = (dbInstance, done) => {
