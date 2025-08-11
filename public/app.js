@@ -865,10 +865,12 @@ function Board({ auth }) {
   const [postEditing, setPostEditing] = React.useState(null);
   const [postEditText, setPostEditText] = React.useState('');
   const [postEditHeadline, setPostEditHeadline] = React.useState('');
+  const [needAuth, setNeedAuth] = React.useState(false);
 
   const load = () => {
     if (!auth.token) {
-      alert('Sign in first');
+      setNeedAuth(true);
+      setPosts([]);
       return;
     }
     fetch('/board/feed', {
@@ -876,9 +878,10 @@ function Board({ auth }) {
     })
       .then(r => {
         if (r.status === 401) {
-          alert('Sign in first');
+          setNeedAuth(true);
           return [];
         }
+        setNeedAuth(false);
         return r.json();
       })
       .then(setPosts);
@@ -979,136 +982,142 @@ function Board({ auth }) {
 
   return (
     <div className="p-4 space-y-2">
-      {auth.token && (
-        <div>
-          <input
-            className="border p-1 mr-2"
-            placeholder="Headline"
-            value={headline}
-            onChange={e => setHeadline(e.target.value)}
-          />
-          <input
-            className="border p-1 mr-2"
-            placeholder="New post"
-            value={content}
-            onChange={e => setContent(e.target.value)}
-          />
-          <button className="bg-blue-600 text-white px-2 py-1" onClick={submit}>
-            Post
-          </button>
-        </div>
-      )}
-      <div className="space-y-2">
-        {posts.map(p => (
-          <div key={p.id} className="border p-2 bg-white">
-            <div
-              className="font-semibold text-lg cursor-pointer"
-              onClick={() => {
-                setExpanded(expanded === p.id ? null : p.id);
-                if (expanded !== p.id) loadComments(p.id);
-              }}
-            >
-              {p.headline}
-            </div>
-            <div className="text-sm text-gray-600">
-              {p.username} - {new Date(p.created_at).toLocaleString()} {p.updated_at ? '(edited)' : ''}
-            </div>
-            {postEditing === p.id ? (
-              <div className="space-x-1 mt-1">
-                <input
-                  className="border p-0.5 mr-1"
-                  placeholder="Headline"
-                  value={postEditHeadline}
-                  onChange={e => setPostEditHeadline(e.target.value)}
-                />
-                <input
-                  className="border p-0.5"
-                  value={postEditText}
-                  onChange={e => setPostEditText(e.target.value)}
-                />
-                <button className="text-green-600" onClick={() => updatePost(p.id, postEditHeadline, postEditText)}>
-                  Save
-                </button>
-                <button className="text-gray-600" onClick={() => setPostEditing(null)}>
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <div>{p.content}</div>
-            )}
-            <div className="space-x-2 text-sm mt-1">
-              <button className="text-blue-600" onClick={() => react(p.id, 'like')}>
-                Like ({p.likes})
+      {needAuth ? (
+        <div>Please sign in to view the board.</div>
+      ) : (
+        <React.Fragment>
+          {auth.token && (
+            <div>
+              <input
+                className="border p-1 mr-2"
+                placeholder="Headline"
+                value={headline}
+                onChange={e => setHeadline(e.target.value)}
+              />
+              <input
+                className="border p-1 mr-2"
+                placeholder="New post"
+                value={content}
+                onChange={e => setContent(e.target.value)}
+              />
+              <button className="bg-blue-600 text-white px-2 py-1" onClick={submit}>
+                Post
               </button>
-              <button className="text-red-600" onClick={() => react(p.id, 'dislike')}>
-                Dislike ({p.dislikes})
-              </button>
-              <span>Comments: {p.comments}</span>
-              {auth.userId == p.user_id && (
-                <span className="space-x-1">
-                  <button
-                    className="text-sm text-blue-700"
+            </div>
+          )}
+          <div className="space-y-2">
+            {posts.map(p => (
+              <div key={p.id} className="border p-2 bg-white">
+                <div
+                  className="font-semibold text-lg cursor-pointer"
                   onClick={() => {
-                    setPostEditing(p.id);
-                    setPostEditText(p.content);
-                    setPostEditHeadline(p.headline);
+                    setExpanded(expanded === p.id ? null : p.id);
+                    if (expanded !== p.id) loadComments(p.id);
                   }}
                 >
-                    Edit
+                  {p.headline}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {p.username} - {new Date(p.created_at).toLocaleString()} {p.updated_at ? '(edited)' : ''}
+                </div>
+                {postEditing === p.id ? (
+                  <div className="space-x-1 mt-1">
+                    <input
+                      className="border p-0.5 mr-1"
+                      placeholder="Headline"
+                      value={postEditHeadline}
+                      onChange={e => setPostEditHeadline(e.target.value)}
+                    />
+                    <input
+                      className="border p-0.5"
+                      value={postEditText}
+                      onChange={e => setPostEditText(e.target.value)}
+                    />
+                    <button className="text-green-600" onClick={() => updatePost(p.id, postEditHeadline, postEditText)}>
+                      Save
+                    </button>
+                    <button className="text-gray-600" onClick={() => setPostEditing(null)}>
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div>{p.content}</div>
+                )}
+                <div className="space-x-2 text-sm mt-1">
+                  <button className="text-blue-600" onClick={() => react(p.id, 'like')}>
+                    Like ({p.likes})
                   </button>
-                  <button className="text-sm text-red-700" onClick={() => removePost(p.id)}>
-                    Delete
+                  <button className="text-red-600" onClick={() => react(p.id, 'dislike')}>
+                    Dislike ({p.dislikes})
                   </button>
-                </span>
-              )}
-            </div>
-            {expanded === p.id && (
-              <div className="mt-2 space-y-1">
-                {(comments[p.id] || []).map(c => (
-                  <div key={c.id} className="border-t pt-1 text-sm">
-                    <span className="font-bold mr-1">{c.username}:</span>
-                    {editing === c.id ? (
-                      <React.Fragment>
-                        <input
-                          className="border p-0.5 mr-1"
-                          value={editText}
-                          onChange={e => setEditText(e.target.value)}
-                        />
-                        <button
-                          className="text-green-600 mr-1"
-                          onClick={() => updateComment(c.id, p.id, editText)}
-                        >
-                          Save
-                        </button>
-                        <button className="text-gray-600" onClick={() => setEditing(null)}>
-                          Cancel
-                        </button>
-                      </React.Fragment>
-                    ) : (
-                      <React.Fragment>
-                        {c.content}
-                        {auth.userId == c.user_id && (
-                          <span className="ml-2 space-x-1">
-                            <button className="text-blue-600" onClick={() => { setEditing(c.id); setEditText(c.content); }}>
-                              Edit
+                  <span>Comments: {p.comments}</span>
+                  {auth.userId == p.user_id && (
+                    <span className="space-x-1">
+                      <button
+                        className="text-sm text-blue-700"
+                        onClick={() => {
+                          setPostEditing(p.id);
+                          setPostEditText(p.content);
+                          setPostEditHeadline(p.headline);
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button className="text-sm text-red-700" onClick={() => removePost(p.id)}>
+                        Delete
+                      </button>
+                    </span>
+                  )}
+                </div>
+                {expanded === p.id && (
+                  <div className="mt-2 space-y-1">
+                    {(comments[p.id] || []).map(c => (
+                      <div key={c.id} className="border-t pt-1 text-sm">
+                        <span className="font-bold mr-1">{c.username}:</span>
+                        {editing === c.id ? (
+                          <React.Fragment>
+                            <input
+                              className="border p-0.5 mr-1"
+                              value={editText}
+                              onChange={e => setEditText(e.target.value)}
+                            />
+                            <button
+                              className="text-green-600 mr-1"
+                              onClick={() => updateComment(c.id, p.id, editText)}
+                            >
+                              Save
                             </button>
-                            <button className="text-red-600" onClick={() => removeComment(c.id, p.id)}>
-                              Delete
+                            <button className="text-gray-600" onClick={() => setEditing(null)}>
+                              Cancel
                             </button>
-                          </span>
+                          </React.Fragment>
+                        ) : (
+                          <React.Fragment>
+                            {c.content}
+                            {auth.userId == c.user_id && (
+                              <span className="ml-2 space-x-1">
+                                <button className="text-blue-600" onClick={() => { setEditing(c.id); setEditText(c.content); }}>
+                                  Edit
+                                </button>
+                                <button className="text-red-600" onClick={() => removeComment(c.id, p.id)}>
+                                  Delete
+                                </button>
+                              </span>
+                            )}
+                          </React.Fragment>
                         )}
-                      </React.Fragment>
+                      </div>
+                    ))}
+                    {auth.token && (
+                      <CommentForm onAdd={text => addComment(p.id, text)} />
                     )}
                   </div>
-                ))}
-                {auth.token && (
-                  <CommentForm onAdd={text => addComment(p.id, text)} />
                 )}
               </div>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
+        </React.Fragment>
+      )}
     </div>
   );
 }
