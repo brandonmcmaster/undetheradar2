@@ -132,7 +132,7 @@ function TrendingPosts() {
   );
 }
 
-function Home() {
+function GuestLanding() {
   return (
     <React.Fragment>
       <section className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-20 hero-section">
@@ -146,6 +146,43 @@ function Home() {
       <TrendingPosts />
     </React.Fragment>
   );
+}
+
+function ArtistLanding() {
+  return (
+    <React.Fragment>
+      <section className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-20 hero-section">
+        <h1 className="text-4xl font-bold mb-4 hero-title">Welcome back!</h1>
+        <p className="mb-6">Share new posts and connect with your fans.</p>
+        <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/profile">
+          Go to Profile
+        </Link>
+      </section>
+      <TrendingPosts />
+    </React.Fragment>
+  );
+}
+
+function UserLanding() {
+  return (
+    <React.Fragment>
+      <section className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-20 hero-section">
+        <h1 className="text-4xl font-bold mb-4 hero-title">Welcome back!</h1>
+        <p className="mb-6">Discover new artists and posts from the community.</p>
+        <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/browse">
+          Browse Artists
+        </Link>
+      </section>
+      <TrendingPosts />
+    </React.Fragment>
+  );
+}
+
+function Home({ auth }) {
+  if (!auth.token) {
+    return <GuestLanding />;
+  }
+  return auth.isArtist ? <ArtistLanding /> : <UserLanding />;
 }
 
 function SignIn({ auth }) {
@@ -1059,7 +1096,7 @@ function App() {
       <div className="min-h-screen bg-gray-50 font-retro">
         <Nav auth={auth} unread={unread} />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home auth={auth} />} />
           <Route path="/signin" element={<SignIn auth={auth} />} />
           <Route path="/profile" element={<Profile auth={auth} />} />
           <Route path="/profile/edit" element={<EditProfile auth={auth} />} />
