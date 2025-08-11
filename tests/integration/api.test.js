@@ -155,6 +155,41 @@ test('board post interactions', async () => {
   expect(list.find(c => c.content === 'Nice')).toBeTruthy();
 });
 
+test('merch and shows feed require following', async () => {
+  const { token: artistToken, id: artistId } = await register({
+    name: 'FeedArtist',
+    username: 'feedartist',
+    password: 'pw',
+    is_artist: true
+  });
+  await context.post('/merch', {
+    headers: { Authorization: `Bearer ${artistToken}` },
+    data: { product_name: 'Hat', price: 5 }
+  });
+  await context.post('/shows', {
+    headers: { Authorization: `Bearer ${artistToken}` },
+    data: { venue: 'Club', date: '2030-01-01' }
+  });
+
+  const { token: fanToken } = await register({
+    name: 'FeedFan',
+    username: 'feedfan',
+    password: 'pw'
+  });
+
+  let merch = await context.get('/merch/feed', { headers: { Authorization: `Bearer ${fanToken}` } });
+  expect((await merch.json()).length).toBe(0);
+  let shows = await context.get('/shows/feed', { headers: { Authorization: `Bearer ${fanToken}` } });
+  expect((await shows.json()).length).toBe(0);
+
+  await context.post(`/follow/${artistId}`, { headers: { Authorization: `Bearer ${fanToken}` } });
+
+  merch = await context.get('/merch/feed', { headers: { Authorization: `Bearer ${fanToken}` } });
+  expect((await merch.json()).length).toBe(1);
+  shows = await context.get('/shows/feed', { headers: { Authorization: `Bearer ${fanToken}` } });
+  expect((await shows.json()).length).toBe(1);
+});
+
 test('board post editing', async () => {
   const { token, id: userId } = await register({
     name: 'Mia',
