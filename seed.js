@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 // Template data arrays; modify or extend as needed
 const users = [
   {
+    id: 1,
     name: 'Demo One',
     username: 'demo1',
     email: 'demo1@example.com',
@@ -10,6 +11,7 @@ const users = [
     is_artist: 0
   },
   {
+    id: 2,
     name: 'Demo Artist',
     username: 'demoartist',
     email: 'demoartist@example.com',
@@ -17,6 +19,7 @@ const users = [
     is_artist: 1
   },
   {
+    id: 3,
     name: 'Demo Two',
     username: 'demo2',
     email: 'demo2@example.com',
@@ -70,8 +73,8 @@ const seed = (dbInstance, done) => {
     users.forEach(u => {
       const hashed = bcrypt.hashSync(u.password, 10);
       dbInstance.run(
-        'INSERT INTO users (name, username, password, email, is_artist) VALUES (?, ?, ?, ?, ?)',
-        [u.name, u.username, hashed, u.email, u.is_artist]
+        'INSERT INTO users (id, name, username, password, email, is_artist) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING',
+        [u.id, u.name, u.username, hashed, u.email, u.is_artist]
       );
     });
 
