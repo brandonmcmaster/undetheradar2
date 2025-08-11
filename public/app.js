@@ -107,18 +107,27 @@ function Nav({ auth, unread }) {
   );
 }
 
-function TrendingPosts() {
+function TrendingPosts({ auth }) {
+  if (!auth || !auth.token) {
+    return null;
+  }
   const [posts, setPosts] = React.useState([]);
   React.useEffect(() => {
-    fetch('/board')
+    fetch('/board/feed', {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
       .then(r => r.json())
       .then(d => {
         const top = d.sort((a, b) => b.likes - a.likes).slice(0, 3);
         setPosts(top);
       });
-  }, []);
+  }, [auth.token]);
+  if (posts.length === 0) {
+    return null;
+  }
   return (
     <div className="max-w-3xl mx-auto mt-8 space-y-4">
+      <h2 className="text-xl font-bold text-center">Highlights from artists you follow.</h2>
       {posts.map(p => (
         <div key={p.id} className="bg-white shadow p-4">
           <h3 className="font-bold">{p.headline}</h3>
@@ -143,12 +152,11 @@ function GuestLanding() {
           Get Started
         </Link>
       </section>
-      <TrendingPosts />
     </React.Fragment>
   );
 }
 
-function ArtistLanding() {
+function ArtistLanding({ auth }) {
   return (
     <React.Fragment>
       <section className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-20 hero-section">
@@ -158,12 +166,12 @@ function ArtistLanding() {
           Go to Profile
         </Link>
       </section>
-      <TrendingPosts />
+      <TrendingPosts auth={auth} />
     </React.Fragment>
   );
 }
 
-function UserLanding() {
+function UserLanding({ auth }) {
   return (
     <React.Fragment>
       <section className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-center py-20 hero-section">
@@ -173,7 +181,7 @@ function UserLanding() {
           Browse Artists
         </Link>
       </section>
-      <TrendingPosts />
+      <TrendingPosts auth={auth} />
     </React.Fragment>
   );
 }
@@ -182,7 +190,7 @@ function Home({ auth }) {
   if (!auth.token) {
     return <GuestLanding />;
   }
-  return auth.isArtist ? <ArtistLanding /> : <UserLanding />;
+  return auth.isArtist ? <ArtistLanding auth={auth} /> : <UserLanding auth={auth} />;
 }
 
 function SignIn({ auth }) {
