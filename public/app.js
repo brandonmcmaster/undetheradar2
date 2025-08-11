@@ -3,22 +3,27 @@
 
 const { BrowserRouter, Routes, Route, Link, useNavigate, useParams } = ReactRouterDOM;
 
-function useToken() {
+function useAuth() {
   const [token, setToken] = React.useState(localStorage.getItem('token') || '');
   const [userId, setUserId] = React.useState(localStorage.getItem('userId') || '');
-  const saveToken = (t, id) => {
+  const [isArtist, setIsArtist] = React.useState(localStorage.getItem('isArtist') === 'true');
+  const saveAuth = (t, id, artist) => {
     localStorage.setItem('token', t);
     localStorage.setItem('userId', id);
+    localStorage.setItem('isArtist', artist ? 'true' : 'false');
     setToken(t);
     setUserId(id);
+    setIsArtist(artist);
   };
   const clear = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+    localStorage.removeItem('isArtist');
     setToken('');
     setUserId('');
+    setIsArtist(false);
   };
-  return { token, userId, saveToken, clear };
+  return { token, userId, isArtist, saveAuth, clear };
 }
 
 function Nav({ auth, unread }) {
@@ -157,7 +162,7 @@ function SignIn({ auth }) {
     });
     const data = await res.json();
     if (data.token) {
-      auth.saveToken(data.token, data.id);
+      auth.saveAuth(data.token, data.id, data.is_artist);
       nav('/profile');
     } else {
       alert('Login failed');
@@ -177,7 +182,7 @@ function SignIn({ auth }) {
     });
     const data = await res.json();
     if (data.token) {
-      auth.saveToken(data.token, data.id);
+      auth.saveAuth(data.token, data.id, data.is_artist);
       nav('/profile');
     } else {
       alert('Registration failed');
@@ -1033,7 +1038,7 @@ function Placeholder({ text }) {
 }
 
 function App() {
-  const auth = useToken();
+  const auth = useAuth();
   const [unread, setUnread] = React.useState(0);
 
   const loadUnread = () => {
