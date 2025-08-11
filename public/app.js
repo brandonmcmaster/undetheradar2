@@ -867,12 +867,24 @@ function Board({ auth }) {
   const [postEditHeadline, setPostEditHeadline] = React.useState('');
 
   const load = () => {
-    fetch('/board')
-      .then(r => r.json())
+    if (!auth.token) {
+      alert('Sign in first');
+      return;
+    }
+    fetch('/board/feed', {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+      .then(r => {
+        if (r.status === 401) {
+          alert('Sign in first');
+          return [];
+        }
+        return r.json();
+      })
       .then(setPosts);
   };
 
-  React.useEffect(load, []);
+  React.useEffect(load, [auth.token]);
 
   const loadComments = id => {
     fetch(`/board/${id}/comments`)

@@ -260,7 +260,6 @@
       "get": {"summary": "Merch from followed users", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Items"}}}
     },
     "/board": {
-      "get": {"summary": "List board posts", "description": "Posts include `updated_at` when edited", "responses": {"200": {"description": "Posts"}}},
       "post": {"summary": "Create board post", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["headline", "content"], "properties": {"headline": {"type": "string"}, "content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
     },
     "/board/user/{id}": {
