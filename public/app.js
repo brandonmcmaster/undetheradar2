@@ -318,11 +318,11 @@ function Profile({ auth }) {
       </div>
       <div>
         <div className="font-bold mb-1">Merch</div>
-        <MerchSection userId={auth.userId} />
+        <MerchSection userId={auth.userId} auth={auth} following={true} />
       </div>
       <div>
         <div className="font-bold mb-1">Upcoming Shows</div>
-        <ShowsSection userId={auth.userId} />
+        <ShowsSection userId={auth.userId} auth={auth} following={true} />
       </div>
     </div>
   );
@@ -554,11 +554,11 @@ function UserDetail() {
       </div>
       <div>
         <div className="font-bold mb-1">Merch</div>
-        <MerchSection userId={id} />
+        <MerchSection userId={id} auth={{ token, userId: viewerId }} following={viewerId == id || following} />
       </div>
       <div>
         <div className="font-bold mb-1">Upcoming Shows</div>
-        <ShowsSection userId={id} />
+        <ShowsSection userId={id} auth={{ token, userId: viewerId }} following={viewerId == id || following} />
       </div>
     </div>
   );
@@ -618,11 +618,11 @@ function ArtistDetail() {
       </div>
       <div>
         <div className="font-bold mb-1">Merch</div>
-        <MerchSection userId={id} />
+        <MerchSection userId={id} auth={{ token, userId: viewerId }} following={viewerId == id || following} />
       </div>
       <div>
         <div className="font-bold mb-1">Upcoming Shows</div>
-        <ShowsSection userId={id} />
+        <ShowsSection userId={id} auth={{ token, userId: viewerId }} following={viewerId == id || following} />
       </div>
     </div>
   );
@@ -812,13 +812,20 @@ function MediaGallery({ userId, auth }) {
   );
 }
 
-function MerchSection({ userId }) {
+function MerchSection({ userId, auth, following }) {
   const [items, setItems] = React.useState([]);
   React.useEffect(() => {
-    fetch(`/merch/user/${userId}`)
+    if (!auth.token || !following) {
+      setItems([]);
+      return;
+    }
+    fetch('/merch/feed', {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
       .then(r => r.json())
-      .then(setItems);
-  }, [userId]);
+      .then(data => setItems(data.filter(m => m.user_id == userId)));
+  }, [userId, auth.token, following]);
+  if (!following) return <div>Follow to view merch.</div>;
   if (!items.length) return <div>No merch yet.</div>;
   return (
     <div className="space-y-2">
@@ -833,13 +840,20 @@ function MerchSection({ userId }) {
   );
 }
 
-function ShowsSection({ userId }) {
+function ShowsSection({ userId, auth, following }) {
   const [shows, setShows] = React.useState([]);
   React.useEffect(() => {
-    fetch(`/shows/user/${userId}`)
+    if (!auth.token || !following) {
+      setShows([]);
+      return;
+    }
+    fetch('/shows/feed', {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
       .then(r => r.json())
-      .then(setShows);
-  }, [userId]);
+      .then(data => setShows(data.filter(s => s.artist_id == userId)));
+  }, [userId, auth.token, following]);
+  if (!following) return <div>Follow to view shows.</div>;
   if (!shows.length) return <div>No upcoming shows.</div>;
   return (
     <div className="space-y-2">
