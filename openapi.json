@@ -214,6 +214,9 @@
         "responses": {"200": {"description": "File metadata"}}
       }
     },
+    "/media/feed": {
+      "get": {"summary": "Media from followed users", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Media list"}}}
+    },
     "/media/{id}": {
       "get": {
         "summary": "Download or stream a file",

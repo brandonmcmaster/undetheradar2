@@ -524,10 +524,25 @@ test('feed endpoints return followed content', async () => {
     data: { product_name: 'Item', price: 5 }
   });
 
+  const fs = require('fs');
+  const path = require('path');
+  const tmp = path.join(__dirname, 'feed.png');
+  fs.writeFileSync(tmp, Buffer.from([0xff, 0xd8, 0xff]));
+  await context.post('/media', {
+    headers: { Authorization: `Bearer ${tb}` },
+    multipart: { file: fs.createReadStream(tmp) }
+  });
+  fs.unlinkSync(tmp);
+
   let feed = await context.get('/board/feed', {
     headers: { Authorization: `Bearer ${ta}` }
   });
   expect((await feed.json()).length).toBe(0);
+
+  const mediaFeed1 = await context.get('/media/feed', {
+    headers: { Authorization: `Bearer ${ta}` }
+  });
+  expect((await mediaFeed1.json()).length).toBe(0);
 
   await context.post(`/follow/${idB}`, {
     headers: { Authorization: `Bearer ${ta}` }
@@ -544,6 +559,11 @@ test('feed endpoints return followed content', async () => {
 
   const merch = await (await context.get('/merch/feed', { headers: { Authorization: `Bearer ${ta}` } })).json();
   expect(merch.length).toBe(1);
+
+  const mediaFeed2 = await context.get('/media/feed', {
+    headers: { Authorization: `Bearer ${ta}` }
+  });
+  expect((await mediaFeed2.json()).length).toBe(1);
 });
 
 test('leaderboard tracks points', async () => {

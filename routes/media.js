@@ -41,6 +41,18 @@ router.get('/', (req, res, next) => {
   });
 });
 
+// Media from followed users
+router.get('/feed', authenticate, (req, res, next) => {
+  const sql = `SELECT media.* FROM media
+    JOIN follows ON follows.followed_id = media.user_id
+    WHERE follows.follower_id = ?
+    ORDER BY uploaded_at DESC`;
+  db.all(sql, [req.user.id], (err, rows) => {
+    if (err) return next(err);
+    res.json(rows);
+  });
+});
+
 // Upload a new file
 router.post('/', authenticate, upload.single('file'), (req, res, next) => {
   if (!req.file) {
