@@ -202,6 +202,8 @@ user who uploaded each file.
 - `GET /board` – list all board posts (each includes `updated_at` if edited)
 - `GET /board/user/:id` – posts by a specific user
 - `GET /board/feed` – posts from users you follow (requires authentication)
+- `GET /board/feed/artists` – posts from followed artists (requires authentication)
+- `GET /board/feed/friends` – posts from followed non-artist friends (requires authentication)
 - `POST /board` – create a new board post with `headline` and `content` (requires authentication)
 - `POST /board/:id/like` – like a post (requires authentication)
 - `POST /board/:id/dislike` – dislike a post (requires authentication)

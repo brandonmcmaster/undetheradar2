@@ -17,6 +17,7 @@ async function register(data) {
 
 test.beforeAll(async () => {
   process.env.DB_FILE = ':memory:';
+  process.env.RATE_LIMIT_MAX = 1000;
   const fs = require('fs');
   const path = require('path');
   const bin = path.join(__dirname, 'bin');
@@ -564,6 +565,60 @@ test('feed endpoints return followed content', async () => {
     headers: { Authorization: `Bearer ${ta}` }
   });
   expect((await mediaFeed2.json()).length).toBe(1);
+});
+
+test('board feed filters artists and friends', async () => {
+  const { token: follower } = await register({
+    name: 'Follower',
+    username: 'follower',
+    password: 'pw'
+  });
+
+  const { token: friendToken, id: friendId } = await register({
+    name: 'Friend',
+    username: 'friend',
+    password: 'pw'
+  });
+
+  const { token: artistToken, id: artistId } = await register({
+    name: 'Artist',
+    username: 'artistfeed',
+    password: 'pw',
+    is_artist: true
+  });
+
+  await context.post('/board', {
+    headers: { Authorization: `Bearer ${friendToken}` },
+    data: { headline: 'Friend post', content: 'hello' }
+  });
+  await context.post('/board', {
+    headers: { Authorization: `Bearer ${artistToken}` },
+    data: { headline: 'Artist post', content: 'art' }
+  });
+
+  await context.post(`/follow/${friendId}`, {
+    headers: { Authorization: `Bearer ${follower}` }
+  });
+  await context.post(`/follow/${artistId}`, {
+    headers: { Authorization: `Bearer ${follower}` }
+  });
+
+  const combined = await (await context.get('/board/feed', {
+    headers: { Authorization: `Bearer ${follower}` }
+  })).json();
+  expect(combined.length).toBe(2);
+
+  const artFeed = await (await context.get('/board/feed/artists', {
+    headers: { Authorization: `Bearer ${follower}` }
+  })).json();
+  expect(artFeed.length).toBe(1);
+  expect(artFeed[0].user_id).toBe(artistId);
+
+  const friendFeed = await (await context.get('/board/feed/friends', {
+    headers: { Authorization: `Bearer ${follower}` }
+  })).json();
+  expect(friendFeed.length).toBe(1);
+  expect(friendFeed[0].user_id).toBe(friendId);
 });
 
 test('leaderboard tracks points', async () => {
