@@ -37,6 +37,7 @@ minimal dependencies. Structured logs are produced with **Pino**. Current endpoi
 - `GET /media` – list uploaded files
 - `POST /media` – upload a file (requires authentication)
 - `GET /media/:id` – stream or download a specific file
+- `GET /media/feed` – media from users you follow (requires authentication)
 - `GET /profile-media/user/:id` – pictures and videos on a user's profile
 - `POST /profile-media` – post a picture or video to your profile (requires authentication)
 
@@ -162,6 +163,7 @@ curl -X POST http://localhost:3000/messages \
 - `GET /media` – list uploaded files with metadata
 - `POST /media` – upload a file using `multipart/form-data` (requires authentication)
 - `GET /media/:id` – stream or download the file by id
+- `GET /media/feed` – media from users you follow (requires authentication)
 
 Example request to upload a file:
 

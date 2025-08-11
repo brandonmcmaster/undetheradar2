@@ -306,7 +306,7 @@ function Profile({ auth }) {
       </div>
       <div>
         <div className="font-bold mb-1">Media</div>
-        <MediaGallery userId={auth.userId} />
+        <MediaGallery userId={auth.userId} auth={auth} />
       </div>
       <div>
         <div className="font-bold mb-1">Merch</div>
@@ -496,6 +496,7 @@ function UserDetail() {
   const { id } = useParams();
   const [user, setUser] = React.useState(null);
   const token = localStorage.getItem('token') || '';
+  const viewerId = localStorage.getItem('userId') || '';
   const [following, setFollowing] = React.useState(false);
   React.useEffect(() => {
     fetch(`/users/${id}`)
@@ -541,7 +542,7 @@ function UserDetail() {
       <div>Social: {user.social || 'N/A'}</div>
       <div>
         <div className="font-bold mb-1">Media</div>
-        <MediaGallery userId={id} />
+        <MediaGallery userId={id} auth={{ token, userId: viewerId }} />
       </div>
       <div>
         <div className="font-bold mb-1">Merch</div>
@@ -559,6 +560,7 @@ function ArtistDetail() {
   const { id } = useParams();
   const [user, setUser] = React.useState(null);
   const token = localStorage.getItem('token') || '';
+  const viewerId = localStorage.getItem('userId') || '';
   const [following, setFollowing] = React.useState(false);
   React.useEffect(() => {
     fetch(`/users/${id}`)
@@ -604,7 +606,7 @@ function ArtistDetail() {
       <div>Social: {user.social || 'N/A'}</div>
       <div>
         <div className="font-bold mb-1">Media</div>
-        <MediaGallery userId={id} />
+        <MediaGallery userId={id} auth={{ token, userId: viewerId }} />
       </div>
       <div>
         <div className="font-bold mb-1">Merch</div>
@@ -698,10 +700,23 @@ function Notifications({ auth, refreshUnread }) {
 function Media({ auth }) {
   const [files, setFiles] = React.useState([]);
   const [file, setFile] = React.useState(null);
+  const [error, setError] = React.useState('');
 
   const loadMedia = () => {
-    fetch('/media')
-      .then(r => r.json())
+    if (!auth.token) {
+      setFiles([]);
+      setError('Please sign in.');
+      return;
+    }
+    fetch('/media/feed', { headers: { Authorization: `Bearer ${auth.token}` } })
+      .then(r => {
+        if (r.status === 401) {
+          setError('Please sign in.');
+          return [];
+        }
+        setError('');
+        return r.json();
+      })
       .then(setFiles);
   };
 
@@ -714,8 +729,9 @@ function Media({ auth }) {
       .then(loadMedia);
   };
 
-  React.useEffect(loadMedia, []);
+  React.useEffect(loadMedia, [auth.token]);
 
+  if (error && !files.length) return <div className="p-4">{error}</div>;
   return (
     <div className="p-4 space-y-2">
       <div>
@@ -734,13 +750,43 @@ function Media({ auth }) {
   );
 }
 
-function MediaGallery({ userId }) {
+function MediaGallery({ userId, auth }) {
   const [files, setFiles] = React.useState([]);
+  const [error, setError] = React.useState('');
+
   React.useEffect(() => {
-    fetch('/media')
-      .then(r => r.json())
-      .then(data => setFiles(data.filter(f => f.user_id == userId)));
-  }, [userId]);
+    setFiles([]);
+    setError('');
+    if (!auth || !auth.token) {
+      setError('Please sign in to view media.');
+      return;
+    }
+    if (String(auth.userId) === String(userId)) {
+      fetch('/media')
+        .then(r => r.json())
+        .then(data => setFiles(data.filter(f => f.user_id == userId)));
+      return;
+    }
+    fetch(`/follow/${userId}`, { headers: { Authorization: `Bearer ${auth.token}` } })
+      .then(r => {
+        if (r.status === 401) {
+          setError('Please sign in to view media.');
+          return null;
+        }
+        return r.json();
+      })
+      .then(d => {
+        if (d && d.following) {
+          fetch('/media')
+            .then(r => r.json())
+            .then(data => setFiles(data.filter(f => f.user_id == userId)));
+        } else if (d) {
+          setError('Follow this user to view their media.');
+        }
+      });
+  }, [userId, auth && auth.token]);
+
+  if (error) return <div>{error}</div>;
   if (!files.length) return <div>No media yet.</div>;
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
