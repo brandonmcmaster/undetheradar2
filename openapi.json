@@ -266,6 +266,12 @@
     "/board/feed": {
       "get": {"summary": "Posts from followed users", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts"}}}
     },
+    "/board/feed/artists": {
+      "get": {"summary": "Posts from followed artists", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts"}}}
+    },
+    "/board/feed/friends": {
+      "get": {"summary": "Posts from followed non-artist friends", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts"}}}
+    },
     "/board/{id}/like": {
       "post": {"summary": "Like a post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Success"}}}
     },
