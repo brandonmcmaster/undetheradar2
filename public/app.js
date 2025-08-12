@@ -26,7 +26,7 @@ function useAuth() {
   return { token, userId, isArtist, saveAuth, clear };
 }
 
-function Nav({ auth, unread }) {
+function Nav({ auth, unread, open, setOpen }) {
   const [avatar, setAvatar] = React.useState(null);
   const [username, setUsername] = React.useState('');
 
@@ -44,11 +44,16 @@ function Nav({ auth, unread }) {
       });
   }, [auth.token, auth.userId]);
 
+  const linkClass = "hover:underline flex items-center";
+  const handleLink = () => setOpen(false);
+
   return (
-    <nav className="bg-blue-800 text-white p-2 flex items-center space-x-4">
+    <nav
+      className={`${open ? 'flex' : 'hidden'} md:flex flex-col space-y-2 text-white p-4 border-r-4 border-blue-900 bg-grunge-dark h-full md:h-screen md:w-56 fixed top-0 left-0 md:static z-10`}
+    >
       {auth.token ? (
-        <div className="flex items-center space-x-2">
-          <Link to="/profile">
+        <div className="flex items-center space-x-2 mb-4">
+          <Link to="/profile" onClick={handleLink}>
             {avatar ? (
               <img className="w-8 h-8 rounded-full" src={`/media/${avatar}`} alt="avatar" />
             ) : (
@@ -56,49 +61,49 @@ function Nav({ auth, unread }) {
             )}
           </Link>
           <span className="text-sm">@{username}</span>
-          <button className="flex items-center" onClick={auth.clear}>
+          <button className="flex items-center" onClick={() => { auth.clear(); setOpen(false); }}>
             <span className="mr-1" role="img" aria-label="logout">🚪</span>
             Logout
           </button>
         </div>
       ) : (
-        <Link className="hover:underline flex items-center" to="/signin">
+        <Link className={linkClass} to="/signin" onClick={handleLink}>
           <span className="mr-1" role="img" aria-label="sign in">🔐</span>
           Sign In
         </Link>
       )}
-      <Link className="hover:underline flex items-center" to="/">
+      <Link className={linkClass} to="/" onClick={handleLink}>
         <span className="mr-1" role="img" aria-label="home">🏠</span>
         Home
       </Link>
-      <Link className="hover:underline flex items-center" to="/browse">
+      <Link className={linkClass} to="/browse" onClick={handleLink}>
         <span className="mr-1" role="img" aria-label="browse">🔍</span>
         Browse
       </Link>
-      <Link className="hover:underline flex items-center" to="/media">
+      <Link className={linkClass} to="/media" onClick={handleLink}>
         <span className="mr-1" role="img" aria-label="media">🖼️</span>
         Media
       </Link>
-      <Link className="hover:underline flex items-center" to="/messages">
+      <Link className={linkClass} to="/messages" onClick={handleLink}>
         <span className="mr-1" role="img" aria-label="messages">✉️</span>
         Messages
       </Link>
-      <Link className="hover:underline relative flex items-center" to="/notifications">
+      <Link className={`${linkClass} relative`} to="/notifications" onClick={handleLink}>
         <span className="mr-1" role="img" aria-label="notifications">🔔</span>
         Notifications
         {unread > 0 && (
           <span className="ml-1 bg-red-600 text-white rounded-full px-1 text-xs">{unread}</span>
         )}
       </Link>
-      <Link className="hover:underline flex items-center" to="/board">
+      <Link className={linkClass} to="/board" onClick={handleLink}>
         <span className="mr-1" role="img" aria-label="board">📝</span>
         Board
       </Link>
-      <Link className="hover:underline flex items-center" to="/shows">
+      <Link className={linkClass} to="/shows" onClick={handleLink}>
         <span className="mr-1" role="img" aria-label="shows">🎸</span>
         Shows
       </Link>
-      <Link className="hover:underline flex items-center" to="/merch">
+      <Link className={linkClass} to="/merch" onClick={handleLink}>
         <span className="mr-1" role="img" aria-label="merch">🛍️</span>
         Merch
       </Link>
@@ -1167,6 +1172,7 @@ function Placeholder({ text }) {
 function App() {
   const auth = useAuth();
   const [unread, setUnread] = React.useState(0);
+  const [navOpen, setNavOpen] = React.useState(false);
 
   const loadUnread = () => {
     if (!auth.token) {
@@ -1183,25 +1189,33 @@ function App() {
   React.useEffect(loadUnread, [auth.token]);
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-grunge-light font-retro">
-        <Nav auth={auth} unread={unread} />
-        <Routes>
-          <Route path="/" element={<Home auth={auth} />} />
-          <Route path="/signin" element={<SignIn auth={auth} />} />
-          <Route path="/profile" element={<Profile auth={auth} />} />
-          <Route path="/profile/edit" element={<EditProfile auth={auth} />} />
-          <Route path="/browse" element={<Browse />} />
-          <Route path="/artists" element={<Artists />} />
-          <Route path="/artists/:id" element={<ArtistDetail />} />
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/users/:id" element={<UserDetail />} />
-          <Route path="/messages" element={<Messages auth={auth} />} />
-          <Route path="/notifications" element={<Notifications auth={auth} refreshUnread={loadUnread} />} />
-          <Route path="/media" element={<Media auth={auth} />} />
-          <Route path="/board" element={<Board auth={auth} />} />
-          <Route path="/shows" element={<Placeholder text="Show calendar" />} />
-          <Route path="/merch" element={<Placeholder text="Merch shop" />} />
-        </Routes>
+      <div className="min-h-screen bg-grunge-light font-retro md:flex">
+        <Nav auth={auth} unread={unread} open={navOpen} setOpen={setNavOpen} />
+        <div className="flex-1">
+          <button
+            className="md:hidden p-2 text-white bg-blue-800"
+            onClick={() => setNavOpen(o => !o)}
+          >
+            ☰
+          </button>
+          <Routes>
+            <Route path="/" element={<Home auth={auth} />} />
+            <Route path="/signin" element={<SignIn auth={auth} />} />
+            <Route path="/profile" element={<Profile auth={auth} />} />
+            <Route path="/profile/edit" element={<EditProfile auth={auth} />} />
+            <Route path="/browse" element={<Browse />} />
+            <Route path="/artists" element={<Artists />} />
+            <Route path="/artists/:id" element={<ArtistDetail />} />
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/users/:id" element={<UserDetail />} />
+            <Route path="/messages" element={<Messages auth={auth} />} />
+            <Route path="/notifications" element={<Notifications auth={auth} refreshUnread={loadUnread} />} />
+            <Route path="/media" element={<Media auth={auth} />} />
+            <Route path="/board" element={<Board auth={auth} />} />
+            <Route path="/shows" element={<Placeholder text="Show calendar" />} />
+            <Route path="/merch" element={<Placeholder text="Merch shop" />} />
+          </Routes>
+        </div>
       </div>
     </BrowserRouter>
   );
