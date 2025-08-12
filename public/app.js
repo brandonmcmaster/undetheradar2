@@ -300,7 +300,7 @@ function Profile({ auth }) {
 
   return (
     <div className={`p-4 space-y-6 max-w-3xl mx-auto ${profile.profile_theme || 'theme-default'}`}>
-      <div className="flex flex-col items-center space-y-2">
+      <div className="flex flex-col items-center space-y-2 border-ragged corner-grunge p-4">
         {profile.avatar_id ? (
           <img className="w-32 h-32 object-cover rounded-full" src={`/media/${profile.avatar_id}`} alt="avatar" />
         ) : (
@@ -1027,7 +1027,7 @@ function Board({ auth }) {
           )}
           <div className="space-y-2">
             {posts.map(p => (
-              <div key={p.id} className="border p-2 bg-white">
+              <div key={p.id} className="border-ragged corner-grunge p-2 bg-white">
                 <div
                   className="font-semibold text-lg cursor-pointer"
                   onClick={() => {
@@ -1092,7 +1092,7 @@ function Board({ auth }) {
                 {expanded === p.id && (
                   <div className="mt-2 space-y-1">
                     {(comments[p.id] || []).map(c => (
-                      <div key={c.id} className="border-t pt-1 text-sm">
+                      <div key={c.id} className="border-ragged corner-grunge p-1 text-sm">
                         <span className="font-bold mr-1">{c.username}:</span>
                         {editing === c.id ? (
                           <React.Fragment>
