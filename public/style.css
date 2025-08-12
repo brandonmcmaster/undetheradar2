@@ -31,3 +31,11 @@ body {
 .hero-title {
   text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
+
+.bg-grunge-dark {
+  background-color: #1a1a1a;
+}
+
+.bg-grunge-light {
+  background-color: #2d2d2d;
+}

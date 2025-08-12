@@ -1183,7 +1183,7 @@ function App() {
   React.useEffect(loadUnread, [auth.token]);
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50 font-retro">
+      <div className="min-h-screen bg-grunge-light font-retro">
         <Nav auth={auth} unread={unread} />
         <Routes>
           <Route path="/" element={<Home auth={auth} />} />
