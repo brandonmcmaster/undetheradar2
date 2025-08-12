@@ -26,13 +26,13 @@ router.get('/user/:id', param('id').isInt(), validate, (req, res, next) => {
   );
 });
 
-// Shows from followed artists
+// Shows from followed artists and self
 router.get('/feed', authenticate, (req, res, next) => {
-  const sql = `SELECT shows.* FROM shows
-    JOIN follows ON follows.followed_id = shows.artist_id
-    WHERE follows.follower_id = ?
+  const sql = `SELECT * FROM shows
+    WHERE artist_id = ?
+      OR artist_id IN (SELECT followed_id FROM follows WHERE follower_id = ?)
     ORDER BY date ASC`;
-  db.all(sql, [req.user.id], (err, rows) => {
+  db.all(sql, [req.user.id, req.user.id], (err, rows) => {
     if (err) return next(err);
     res.json(rows);
   });
