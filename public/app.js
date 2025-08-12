@@ -803,10 +803,25 @@ function MediaGallery({ userId, auth }) {
   );
 }
 
-
+function MerchSection({ userId, auth, following }) {
   const [items, setItems] = React.useState([]);
   const [error, setError] = React.useState('');
+
   React.useEffect(() => {
+    setItems([]);
+    setError('');
+    if (!following) {
+      setError('Follow this user to view their merch.');
+      return;
+    }
+    const url = `/merch/user/${userId}`;
+    fetch(url)
+      .then(r => r.json())
+      .then(setItems)
+      .catch(() => setError('Failed to load merch.'));
+  }, [userId, auth.token, following]);
+
+  if (error) return <div>{error}</div>;
   if (!items.length) return <div>No merch yet.</div>;
   return (
     <div className="space-y-2">
@@ -821,10 +836,25 @@ function MediaGallery({ userId, auth }) {
   );
 }
 
-
+function ShowsSection({ userId, auth, following }) {
   const [shows, setShows] = React.useState([]);
   const [error, setError] = React.useState('');
+
   React.useEffect(() => {
+    setShows([]);
+    setError('');
+    if (!following) {
+      setError('Follow this user to view their shows.');
+      return;
+    }
+    const url = `/shows/user/${userId}`;
+    fetch(url)
+      .then(r => r.json())
+      .then(setShows)
+      .catch(() => setError('Failed to load shows.'));
+  }, [userId, auth.token, following]);
+
+  if (error) return <div>{error}</div>;
   if (!shows.length) return <div>No upcoming shows.</div>;
   return (
     <div className="space-y-2">
