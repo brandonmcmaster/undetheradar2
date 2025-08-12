@@ -145,7 +145,7 @@ function GuestLanding() {
   return (
     <React.Fragment>
       <section className="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-gray-100 text-center py-20 hero-section">
-        <h1 className="text-4xl font-bold mb-4 hero-title">Under the Radar</h1>
+        <h1 className="text-4xl font-bold mb-4 hero-title font-grunge">Under the Radar</h1>
         <p className="text-lg mb-2">A home for underground musicians to share their art without algorithms.</p>
         <p className="mb-6">Create a profile, upload your tracks and photos, list shows and sell merch directly to fans.</p>
         <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/signin">
@@ -160,7 +160,7 @@ function ArtistLanding({ auth }) {
   return (
     <React.Fragment>
       <section className="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-gray-100 text-center py-20 hero-section">
-        <h1 className="text-4xl font-bold mb-4 hero-title">Welcome back!</h1>
+        <h1 className="text-4xl font-bold mb-4 hero-title font-grunge">Welcome back!</h1>
         <p className="mb-6">Share new posts and connect with your fans.</p>
         <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/profile">
           Go to Profile
@@ -175,7 +175,7 @@ function UserLanding({ auth }) {
   return (
     <React.Fragment>
       <section className="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-gray-100 text-center py-20 hero-section">
-        <h1 className="text-4xl font-bold mb-4 hero-title">Welcome back!</h1>
+        <h1 className="text-4xl font-bold mb-4 hero-title font-grunge">Welcome back!</h1>
         <p className="mb-6">Discover new artists and posts from the community.</p>
         <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/browse">
           Browse Artists
@@ -303,7 +303,7 @@ function Profile({ auth }) {
         )}
         <input type="file" onChange={e => setAvatarFile(e.target.files[0])} />
         <button className="bg-blue-600 text-white px-2 py-1" onClick={uploadAvatar}>Upload Avatar</button>
-        <div className="text-xl font-bold">{profile.name}</div>
+        <div className="text-xl font-bold font-grunge">{profile.name}</div>
         <div className="text-sm">@{profile.username}</div>
         <div>Email: {profile.email || 'N/A'}</div>
         <div>Bio: {profile.bio || 'N/A'}</div>
@@ -477,7 +477,7 @@ function Browse({ defaultTab = 'artist' }) {
               <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
             )}
             <div>
-              <div className="font-bold">{u.name}</div>
+              <div className="font-bold font-grunge">{u.name}</div>
               <div className="text-sm">@{u.username}</div>
             </div>
           </Link>
@@ -528,7 +528,7 @@ function UserDetail() {
           <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
         )}
         <div>
-          <div className="text-xl font-bold">{user.name}</div>
+          <div className="text-xl font-bold font-grunge">{user.name}</div>
           <div className="text-sm mb-2">@{user.username}</div>
           {token && localStorage.getItem('userId') != id && (
             <button className="text-blue-600" onClick={toggle}>
@@ -587,7 +587,7 @@ function ArtistDetail() {
           <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center text-sm">N/A</div>
         )}
         <div>
-          <div className="text-xl font-bold">{user.name}</div>
+          <div className="text-xl font-bold font-grunge">{user.name}</div>
           <div className="text-sm mb-2">@{user.username}</div>
           {token && localStorage.getItem('userId') != id && (
             <button className="text-blue-600" onClick={toggle}>

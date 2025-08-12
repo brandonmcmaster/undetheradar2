@@ -5,6 +5,10 @@ body {
   font-family: 'Courier New', monospace;
 }
 
+.font-grunge {
+  font-family: 'Rock Salt', cursive;
+}
+
 .theme-default {
   background-color: #f9fafb;
   color: #000;
