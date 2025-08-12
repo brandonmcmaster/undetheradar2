@@ -44,7 +44,7 @@ test.afterAll(async () => {
   server.close();
 });
 
-test('merch and shows require following', async ({}, testInfo) => {
+test('media, merch and shows require following', async ({}, testInfo) => {
   testInfo.skip(skip, 'browser not available');
   const artist = await register({ name: 'Art', username: 'artistf', password: 'pw', is_artist: true });
   const viewer = await register({ name: 'View', username: 'viewerf', password: 'pw' });
@@ -67,6 +67,7 @@ test('merch and shows require following', async ({}, testInfo) => {
 
   await page.goto(`${baseURL}/artists/${artist.id}`);
 
+  await page.waitForSelector('text=Follow this user to view their media.');
   await page.waitForSelector('text=Follow this user to view their merch.');
   await page.waitForSelector('text=Follow this user to view their shows.');
 });
