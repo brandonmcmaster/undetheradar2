@@ -318,11 +318,11 @@ function Profile({ auth }) {
       </div>
       <div>
         <div className="font-bold mb-1">Merch</div>
-        <MerchSection userId={auth.userId} />
+        <MerchSection userId={auth.userId} auth={auth} />
       </div>
       <div>
         <div className="font-bold mb-1">Upcoming Shows</div>
-        <ShowsSection userId={auth.userId} />
+        <ShowsSection userId={auth.userId} auth={auth} />
       </div>
     </div>
   );
@@ -554,11 +554,11 @@ function UserDetail() {
       </div>
       <div>
         <div className="font-bold mb-1">Merch</div>
-        <MerchSection userId={id} />
+        <MerchSection userId={id} auth={{ token, userId: viewerId }} />
       </div>
       <div>
         <div className="font-bold mb-1">Upcoming Shows</div>
-        <ShowsSection userId={id} />
+        <ShowsSection userId={id} auth={{ token, userId: viewerId }} />
       </div>
     </div>
   );
@@ -618,11 +618,11 @@ function ArtistDetail() {
       </div>
       <div>
         <div className="font-bold mb-1">Merch</div>
-        <MerchSection userId={id} />
+        <MerchSection userId={id} auth={{ token, userId: viewerId }} />
       </div>
       <div>
         <div className="font-bold mb-1">Upcoming Shows</div>
-        <ShowsSection userId={id} />
+        <ShowsSection userId={id} auth={{ token, userId: viewerId }} />
       </div>
     </div>
   );
@@ -792,7 +792,7 @@ function MediaGallery({ userId, auth }) {
           setError('Follow this user to view their media.');
         }
       });
-  }, [userId, auth && auth.token]);
+  }, [userId, auth && auth.token, auth && auth.userId]);
 
   if (error) return <div>{error}</div>;
   if (!files.length) return <div>No media yet.</div>;
@@ -812,13 +812,41 @@ function MediaGallery({ userId, auth }) {
   );
 }
 
-function MerchSection({ userId }) {
+function MerchSection({ userId, auth }) {
   const [items, setItems] = React.useState([]);
+  const [error, setError] = React.useState('');
   React.useEffect(() => {
-    fetch(`/merch/user/${userId}`)
-      .then(r => r.json())
-      .then(setItems);
-  }, [userId]);
+    setItems([]);
+    setError('');
+    if (auth && String(auth.userId) === String(userId)) {
+      fetch(`/merch/user/${userId}`)
+        .then(r => r.json())
+        .then(setItems);
+      return;
+    }
+    if (!auth || !auth.token) {
+      setError('Please sign in to view merch.');
+      return;
+    }
+    fetch(`/follow/${userId}`, { headers: { Authorization: `Bearer ${auth.token}` } })
+      .then(r => {
+        if (r.status === 401) {
+          setError('Please sign in to view merch.');
+          return null;
+        }
+        return r.json();
+      })
+      .then(d => {
+        if (d && d.following) {
+          fetch(`/merch/user/${userId}`)
+            .then(r => r.json())
+            .then(setItems);
+        } else if (d) {
+          setError('Follow this user to view their merch.');
+        }
+      });
+  }, [userId, auth && auth.token, auth && auth.userId]);
+  if (error) return <div>{error}</div>;
   if (!items.length) return <div>No merch yet.</div>;
   return (
     <div className="space-y-2">
@@ -833,13 +861,41 @@ function MerchSection({ userId }) {
   );
 }
 
-function ShowsSection({ userId }) {
+function ShowsSection({ userId, auth }) {
   const [shows, setShows] = React.useState([]);
+  const [error, setError] = React.useState('');
   React.useEffect(() => {
-    fetch(`/shows/user/${userId}`)
-      .then(r => r.json())
-      .then(setShows);
-  }, [userId]);
+    setShows([]);
+    setError('');
+    if (auth && String(auth.userId) === String(userId)) {
+      fetch(`/shows/user/${userId}`)
+        .then(r => r.json())
+        .then(setShows);
+      return;
+    }
+    if (!auth || !auth.token) {
+      setError('Please sign in to view shows.');
+      return;
+    }
+    fetch(`/follow/${userId}`, { headers: { Authorization: `Bearer ${auth.token}` } })
+      .then(r => {
+        if (r.status === 401) {
+          setError('Please sign in to view shows.');
+          return null;
+        }
+        return r.json();
+      })
+      .then(d => {
+        if (d && d.following) {
+          fetch(`/shows/user/${userId}`)
+            .then(r => r.json())
+            .then(setShows);
+        } else if (d) {
+          setError('Follow this user to view their shows.');
+        }
+      });
+  }, [userId, auth && auth.token, auth && auth.userId]);
+  if (error) return <div>{error}</div>;
   if (!shows.length) return <div>No upcoming shows.</div>;
   return (
     <div className="space-y-2">
