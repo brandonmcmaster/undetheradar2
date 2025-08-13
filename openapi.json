@@ -263,16 +263,16 @@
       "post": {"summary": "Create board post", "security": [{"BearerAuth": []}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["headline", "content"], "properties": {"headline": {"type": "string"}, "content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
     },
     "/board/user/{id}": {
-      "get": {"summary": "Posts by user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Posts"}}}
+      "get": {"summary": "Posts by user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Posts include name, avatar_id and is_artist"}}}
     },
     "/board/feed": {
-      "get": {"summary": "Posts from followed users", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts"}}}
+      "get": {"summary": "Posts from followed users", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts include name, avatar_id and is_artist"}}}
     },
     "/board/feed/artists": {
-      "get": {"summary": "Posts from followed artists", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts"}}}
+      "get": {"summary": "Posts from followed artists", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts include name, avatar_id and is_artist"}}}
     },
     "/board/feed/friends": {
-      "get": {"summary": "Posts from followed non-artist friends", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts"}}}
+      "get": {"summary": "Posts from followed non-artist friends", "security": [{"BearerAuth": []}], "responses": {"200": {"description": "Posts include name, avatar_id and is_artist"}}}
     },
     "/board/{id}/like": {
       "post": {"summary": "Like a post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Success"}}}
@@ -281,7 +281,7 @@
       "post": {"summary": "Dislike a post", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Success"}}}
     },
     "/board/{id}/comments": {
-      "get": {"summary": "List comments", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Comments"}}},
+      "get": {"summary": "List comments", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Comments include name, avatar_id and is_artist"}}},
       "post": {"summary": "Add comment", "security": [{"BearerAuth": []}], "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["content"], "properties": {"content": {"type": "string"}}}}}}, "responses": {"200": {"description": "Created"}}}
     },
     "/board/comments/{id}": {
