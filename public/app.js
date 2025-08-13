@@ -44,15 +44,15 @@ function Nav({ auth, unread, open, setOpen }) {
       });
   }, [auth.token, auth.userId]);
 
-  const linkClass = "hover:underline flex items-center";
+  const linkClass = "hover:underline flex items-center p-2";
   const handleLink = () => setOpen(false);
 
   return (
     <nav
-      className={`${open ? 'flex' : 'hidden'} md:flex flex-col space-y-2 text-white p-4 border-r-4 border-blue-900 bg-grunge-dark h-full md:h-screen md:w-56 fixed top-0 left-0 md:static z-10`}
+      className={`${open ? 'flex' : 'hidden'} md:flex flex-col text-white p-4 bg-grunge-dark h-full md:h-screen md:w-56 fixed top-0 left-0 md:static z-10 border border-gray-200 md:border-r-4 md:border-r-blue-900 divide-y divide-gray-200 rounded`}
     >
       {auth.token ? (
-        <div className="flex items-center space-x-2 mb-4">
+        <div className="flex items-center space-x-2 p-2">
           <Link to="/profile" onClick={handleLink}>
             {avatar ? (
               <img className="w-8 h-8 rounded-full" src={`/media/${avatar}`} alt="avatar" />
@@ -131,10 +131,10 @@ function TrendingPosts({ auth }) {
     return null;
   }
   return (
-    <div className="max-w-3xl mx-auto mt-8 space-y-4">
-      <h2 className="text-xl font-bold text-center">Highlights from artists you follow.</h2>
+    <div className="container mx-auto mt-8 border border-gray-200 rounded divide-y divide-gray-200">
+      <h2 className="text-xl font-bold text-center p-4">Highlights from artists you follow.</h2>
       {posts.map(p => (
-        <div key={p.id} className="bg-white shadow p-4">
+        <div key={p.id} className="bg-white p-4">
           <h3 className="font-bold">{p.headline}</h3>
           <p className="text-sm">
             {p.content.slice(0, 100)}{p.content.length > 100 ? '...' : ''}
@@ -149,7 +149,7 @@ function TrendingPosts({ auth }) {
 function GuestLanding() {
   return (
     <React.Fragment>
-      <section className="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-gray-100 text-center py-20 hero-section">
+      <section className="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-gray-100 text-center py-20 hero-section border border-gray-200 rounded">
         <h1 className="text-4xl font-bold mb-4 hero-title font-grunge">Under the Radar</h1>
         <p className="text-lg mb-2">A home for underground musicians to share their art without algorithms.</p>
         <p className="mb-6">Create a profile, upload your tracks and photos, list shows and sell merch directly to fans.</p>
@@ -164,7 +164,7 @@ function GuestLanding() {
 function ArtistLanding({ auth }) {
   return (
     <React.Fragment>
-      <section className="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-gray-100 text-center py-20 hero-section">
+      <section className="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-gray-100 text-center py-20 hero-section border border-gray-200 rounded">
         <h1 className="text-4xl font-bold mb-4 hero-title font-grunge">Welcome back!</h1>
         <p className="mb-6">Share new posts and connect with your fans.</p>
         <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/profile">
@@ -179,7 +179,7 @@ function ArtistLanding({ auth }) {
 function UserLanding({ auth }) {
   return (
     <React.Fragment>
-      <section className="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-gray-100 text-center py-20 hero-section">
+      <section className="w-full bg-gradient-to-r from-indigo-700 to-purple-800 text-gray-100 text-center py-20 hero-section border border-gray-200 rounded">
         <h1 className="text-4xl font-bold mb-4 hero-title font-grunge">Welcome back!</h1>
         <p className="mb-6">Discover new artists and posts from the community.</p>
         <Link className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100" to="/browse">
@@ -1191,9 +1191,9 @@ function App() {
     <BrowserRouter>
       <div className="min-h-screen bg-grunge-light font-retro md:flex">
         <Nav auth={auth} unread={unread} open={navOpen} setOpen={setNavOpen} />
-        <div className="flex-1">
+        <div className="flex-1 container mx-auto border border-gray-200 rounded divide-y divide-gray-200">
           <button
-            className="md:hidden p-2 text-white bg-blue-800"
+            className="md:hidden p-2 text-white bg-blue-800 w-full"
             onClick={() => setNavOpen(o => !o)}
           >
             ☰
