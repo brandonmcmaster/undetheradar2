@@ -10,7 +10,7 @@ const { addPoints, awardBadge } = require('../utils/gamify');
 // Get posts by user
 router.get('/user/:id', param('id').isInt(), validate, (req, res, next) => {
   const sql = `
-    SELECT board_posts.*, users.username,
+    SELECT board_posts.*, users.username, users.name, users.avatar_id, users.is_artist,
       (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = 1) AS likes,
       (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = -1) AS dislikes,
       (SELECT COUNT(*) FROM board_comments WHERE post_id = board_posts.id) AS comments
@@ -27,7 +27,7 @@ router.get('/user/:id', param('id').isInt(), validate, (req, res, next) => {
 // Get posts from followed users
 router.get('/feed', authenticate, (req, res, next) => {
   const sql = `
-    SELECT board_posts.*, users.username,
+    SELECT board_posts.*, users.username, users.name, users.avatar_id, users.is_artist,
       (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = 1) AS likes,
       (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = -1) AS dislikes,
       (SELECT COUNT(*) FROM board_comments WHERE post_id = board_posts.id) AS comments
@@ -45,7 +45,7 @@ router.get('/feed', authenticate, (req, res, next) => {
 // Get posts from followed artists
 router.get('/feed/artists', authenticate, (req, res, next) => {
   const sql = `
-    SELECT board_posts.*, users.username,
+    SELECT board_posts.*, users.username, users.name, users.avatar_id, users.is_artist,
       (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = 1) AS likes,
       (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = -1) AS dislikes,
       (SELECT COUNT(*) FROM board_comments WHERE post_id = board_posts.id) AS comments
@@ -63,7 +63,7 @@ router.get('/feed/artists', authenticate, (req, res, next) => {
 // Get posts from followed non-artist friends
 router.get('/feed/friends', authenticate, (req, res, next) => {
   const sql = `
-    SELECT board_posts.*, users.username,
+    SELECT board_posts.*, users.username, users.name, users.avatar_id, users.is_artist,
       (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = 1) AS likes,
       (SELECT COUNT(*) FROM board_reactions WHERE post_id = board_posts.id AND reaction = -1) AS dislikes,
       (SELECT COUNT(*) FROM board_comments WHERE post_id = board_posts.id) AS comments
@@ -134,7 +134,7 @@ router.post('/:id/dislike', authenticate, param('id').isInt(), validate, (req, r
 
 // Get comments for a post
 router.get('/:id/comments', param('id').isInt(), validate, (req, res, next) => {
-  const sql = `SELECT board_comments.*, users.username FROM board_comments
+  const sql = `SELECT board_comments.*, users.username, users.name, users.avatar_id, users.is_artist FROM board_comments
     JOIN users ON board_comments.user_id = users.id
     WHERE post_id = ? ORDER BY created_at ASC`;
   db.all(sql, [req.params.id], (err, rows) => {

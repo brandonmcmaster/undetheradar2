@@ -1037,8 +1037,19 @@ function Board({ auth }) {
                 >
                   {p.headline}
                 </div>
-                <div className="text-sm text-gray-600">
-                  {p.username} - {new Date(p.created_at).toLocaleString()} {p.updated_at ? '(edited)' : ''}
+                <div className="flex items-center text-sm text-gray-600">
+                  {p.avatar_id && (
+                    <img
+                      className="w-6 h-6 rounded-full mr-1"
+                      src={`/media/${p.avatar_id}`}
+                      alt="avatar"
+                    />
+                  )}
+                  <span className="mr-1">{p.name}</span>
+                  <span className="text-xs">({p.is_artist ? 'artist' : 'user'})</span>
+                  <span className="ml-1">
+                    - {new Date(p.created_at).toLocaleString()} {p.updated_at ? '(edited)' : ''}
+                  </span>
                 </div>
                 {postEditing === p.id ? (
                   <div className="space-x-1 mt-1">
@@ -1093,7 +1104,19 @@ function Board({ auth }) {
                   <div className="mt-2 space-y-1">
                     {(comments[p.id] || []).map(c => (
                       <div key={c.id} className="border-ragged corner-grunge p-1 text-sm">
-                        <span className="font-bold mr-1">{c.username}:</span>
+                        <div className="flex items-center mb-1">
+                          {c.avatar_id && (
+                            <img
+                              className="w-4 h-4 rounded-full mr-1"
+                              src={`/media/${c.avatar_id}`}
+                              alt="avatar"
+                            />
+                          )}
+                          <span className="font-bold mr-1">{c.name}</span>
+                          <span className="text-xs text-gray-600">
+                            ({c.is_artist ? 'artist' : 'user'})
+                          </span>
+                        </div>
                         {editing === c.id ? (
                           <React.Fragment>
                             <input

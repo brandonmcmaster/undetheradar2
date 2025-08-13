@@ -18,6 +18,7 @@ to:
 - Sell merchandise directly
 - Participate in a message board without algorithmic feeds
 - Post updates to a shared bulletin board
+- See avatars and artist status on board posts and comments
 - Follow other users and receive notifications for new activity
 - View posts, shows and merch from people you follow
 - Customize profile pages with sanitized HTML snippets or preset color themes
@@ -198,6 +199,8 @@ user who uploaded each file.
 - `POST /merch` – create a merch item (requires authentication)
 
 ### `/board`
+
+- All post and comment responses include `name`, `avatar_id` and `is_artist` to identify authors.
 
 - `GET /board/user/:id` – posts by a specific user
 - `GET /board/feed` – posts from users you follow (requires authentication)

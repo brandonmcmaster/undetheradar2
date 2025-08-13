@@ -113,7 +113,11 @@ test('board post creation', async () => {
   const all = await context.get(`/board/user/${id}`);
   expect(all.ok()).toBeTruthy();
   const items = await all.json();
-  expect(items.find(p => p.headline === 'Test' && p.content === 'Hello board')).toBeTruthy();
+  const found = items.find(p => p.headline === 'Test' && p.content === 'Hello board');
+  expect(found).toBeTruthy();
+  expect(found.name).toBe('Dana');
+  expect(found.is_artist).toBe(0);
+  expect(found.avatar_id).toBeNull();
 });
 
 test('board post interactions', async () => {
@@ -149,10 +153,17 @@ test('board post interactions', async () => {
   const arr = await posts.json();
   const p = arr.find(x => x.id === id);
   expect(p.likes).toBe(1);
+  expect(p.name).toBe('Ed');
+  expect(p.is_artist).toBe(0);
+  expect(p.avatar_id).toBeNull();
 
   const comms = await context.get(`/board/${id}/comments`);
   const list = await comms.json();
-  expect(list.find(c => c.content === 'Nice')).toBeTruthy();
+  const com = list.find(c => c.content === 'Nice');
+  expect(com).toBeTruthy();
+  expect(com.name).toBe('Fay');
+  expect(com.is_artist).toBe(0);
+  expect(com.avatar_id).toBeNull();
 });
 
 test('merch and shows feed require following', async () => {
