@@ -134,13 +134,15 @@ function TrendingPosts({ auth }) {
     <div className="container mx-auto mt-8 border border-gray-200 rounded divide-y divide-gray-200">
       <h2 className="text-xl font-bold text-center p-4">Highlights from artists you follow.</h2>
       {posts.map(p => (
-        <div key={p.id} className="bg-white p-4">
-          <h3 className="font-bold">{p.headline}</h3>
-          <p className="text-sm">
-            {p.content.slice(0, 100)}{p.content.length > 100 ? '...' : ''}
-          </p>
-          <div className="text-xs text-gray-600 mt-2">{p.likes} likes</div>
-        </div>
+        <Link key={p.id} to={`/board/${p.id}`} className="block">
+          <div className="bg-white p-4">
+            <h3 className="font-bold">{p.headline}</h3>
+            <p className="text-sm">
+              {p.content.slice(0, 100)}{p.content.length > 100 ? '...' : ''}
+            </p>
+            <div className="text-xs text-gray-600 mt-2">{p.likes} likes</div>
+          </div>
+        </Link>
       ))}
     </div>
   );
@@ -875,6 +877,7 @@ function ShowsSection({ userId, auth, following }) {
 }
 
 function Board({ auth }) {
+  const { postId } = useParams();
   const [posts, setPosts] = React.useState([]);
   const [content, setContent] = React.useState('');
   const [headline, setHeadline] = React.useState('');
@@ -904,10 +907,17 @@ function Board({ auth }) {
         setNeedAuth(false);
         return r.json();
       })
-      .then(setPosts);
+      .then(d => {
+        setPosts(d);
+        if (postId) {
+          const id = parseInt(postId, 10);
+          setExpanded(id);
+          loadComments(id);
+        }
+      });
   };
 
-  React.useEffect(load, [auth.token]);
+  React.useEffect(load, [auth.token, postId]);
 
   const loadComments = id => {
     fetch(`/board/${id}/comments`)
@@ -1234,6 +1244,7 @@ function App() {
             <Route path="/messages" element={<Messages auth={auth} />} />
             <Route path="/notifications" element={<Notifications auth={auth} refreshUnread={loadUnread} />} />
             <Route path="/media" element={<Media auth={auth} />} />
+            <Route path="/board/:postId" element={<Board auth={auth} />} />
             <Route path="/board" element={<Board auth={auth} />} />
             <Route path="/shows" element={<Placeholder text="Show calendar" />} />
             <Route path="/merch" element={<Placeholder text="Merch shop" />} />
